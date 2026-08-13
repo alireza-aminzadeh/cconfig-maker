@@ -2,6 +2,9 @@
 
 ابزار تک‌صفحه‌ای (Pure HTML/JS) برای ساخت، تست و مدیریت کانفیگ‌های **VMess** و **VLess** با IPهای Cloudflare.
 
+- **مخزن:** [github.com/alireza-aminzadeh/cconfig-maker](https://github.com/alireza-aminzadeh/cconfig-maker)
+- **نسخه آنلاین:** [alireza-aminzadeh.github.io/cconfig-maker](https://alireza-aminzadeh.github.io/cconfig-maker/)
+
 ## امکانات
 
 ### Config Maker
@@ -58,7 +61,7 @@ git init
 git add .
 git commit -m "Initial commit: V2Ray Config Maker"
 git branch -M main
-git remote add origin https://github.com/YOUR_USER/cconfig-maker.git
+git remote add origin https://github.com/alireza-aminzadeh/cconfig-maker.git
 git push -u origin main
 ```
 
@@ -71,7 +74,7 @@ git push -u origin main
 آدرس نهایی:
 
 ```text
-https://YOUR_USER.github.io/cconfig-maker/
+https://alireza-aminzadeh.github.io/cconfig-maker/
 ```
 
 ### ۳. Custom domain (اختیاری)

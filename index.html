@@ -4,35 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>V2Ray Config Maker</title>
+  <link rel="canonical" href="https://alireza-aminzadeh.github.io/cconfig-maker/" />
+  <meta property="og:url" content="https://alireza-aminzadeh.github.io/cconfig-maker/" />
+  <meta property="og:title" content="V2Ray Config Maker" />
   <style>
-    /* ── Variables (Stanford Light Theme) ─────── */
+    /* ── Variables ─────────────────────────────── */
     :root {
-      --cardinal: #8C1515;
-      --cardinal-d: #820000;
-      --cardinal-l: #B83A4B;
-      --cardinal-muted: rgba(140, 21, 21, 0.08);
-      --bg: #F4F4F4;
-      --surface: #FFFFFF;
-      --surface2: #FAFAFA;
-      --border: rgba(140, 21, 21, 0.14);
-      --border-h: rgba(140, 21, 21, 0.32);
-      --indigo: #8C1515; --indigo-d: #820000;
-      --cyan: #B83A4B; --violet: #651C32;
-      --emerald: #009B76; --amber: #E98300;
-      --rose: #E04F39; --orange: #E98300;
-      --text: #2E2D29; --text2: #53565A; --text3: #7F7776;
-      --shadow: 0 2px 12px rgba(46, 45, 41, 0.08);
-      --shadow-lg: 0 8px 28px rgba(46, 45, 41, 0.1);
+      --bg: #030712;
+      --surface: rgba(15, 23, 42, 0.85);
+      --surface2: rgba(10, 16, 32, 0.9);
+      --border: rgba(99, 102, 241, 0.18);
+      --border-h: rgba(99, 102, 241, 0.45);
+      --indigo: #6366f1; --indigo-d: #4338ca;
+      --cyan: #06b6d4; --violet: #8b5cf6;
+      --emerald: #10b981; --amber: #f59e0b;
+      --rose: #f43f5e; --orange: #f97316;
+      --text: #f1f5f9; --text2: #94a3b8; --text3: #475569;
       --mono: 'Courier New','Consolas',monospace;
-    }
-    [data-theme="dark"] {
-      --cardinal: #E04F39; --cardinal-d: #C43A28; --cardinal-l: #F47963;
-      --cardinal-muted: rgba(224, 79, 57, 0.12);
-      --bg: #1A1A1A; --surface: #242424; --surface2: #2E2E2E;
-      --border: rgba(255,255,255,.1); --border-h: rgba(255,255,255,.2);
-      --text: #F4F4F4; --text2: #B0B0B0; --text3: #808080;
-      --shadow: 0 2px 12px rgba(0,0,0,.35);
-      --shadow-lg: 0 8px 28px rgba(0,0,0,.45);
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -40,19 +28,13 @@
       background: var(--bg); color: var(--text);
       min-height: 100vh; overflow-x: hidden;
     }
-    body::before {
-      content: '';
-      position: fixed; top: 0; left: 0; right: 0;
-      height: 4px; background: var(--cardinal);
-      z-index: 1000;
-    }
 
     /* ── Blobs ──────────────────────────────────── */
     .blobs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-    .blobs span { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .12; animation: drift 18s ease-in-out infinite alternate; }
-    .blobs span:nth-child(1) { width:500px;height:500px;background:var(--cardinal);top:-100px;left:-150px;animation-duration:20s }
-    .blobs span:nth-child(2) { width:400px;height:400px;background:var(--cardinal-l);top:40%;right:-100px;animation-duration:15s;animation-delay:-5s }
-    .blobs span:nth-child(3) { width:350px;height:350px;background:#DAD7CB;bottom:-100px;left:30%;animation-duration:22s;animation-delay:-8s }
+    .blobs span { position: absolute; border-radius: 50%; filter: blur(80px); opacity: .16; animation: drift 18s ease-in-out infinite alternate; }
+    .blobs span:nth-child(1) { width:500px;height:500px;background:var(--indigo);top:-100px;left:-150px;animation-duration:20s }
+    .blobs span:nth-child(2) { width:400px;height:400px;background:var(--violet);top:40%;right:-100px;animation-duration:15s;animation-delay:-5s }
+    .blobs span:nth-child(3) { width:350px;height:350px;background:var(--cyan);bottom:-100px;left:30%;animation-duration:22s;animation-delay:-8s }
     @keyframes drift {
       0%   { transform: translate(0,0) scale(1); }
       50%  { transform: translate(40px,30px) scale(1.05); }
@@ -67,39 +49,39 @@
     .logo-ring {
       display: inline-flex; align-items: center; justify-content: center;
       width:68px;height:68px; border-radius:22px;
-      background: linear-gradient(135deg, var(--cardinal), var(--cardinal-d));
-      box-shadow: 0 4px 20px rgba(140,21,21,.28);
+      background: linear-gradient(135deg, var(--indigo), var(--cyan));
+      box-shadow: 0 0 28px rgba(99,102,241,.5);
       animation: logo-pulse 3s ease-in-out infinite; font-size:34px; margin-bottom:18px;
-      color: #fff;
     }
     @keyframes logo-pulse {
-      0%,100%{box-shadow:0 4px 20px rgba(140,21,21,.28)}
-      50%{box-shadow:0 6px 32px rgba(140,21,21,.4)}
+      0%,100%{box-shadow:0 0 24px 0 rgba(99,102,241,.5)}
+      50%{box-shadow:0 0 48px 8px rgba(99,102,241,.7)}
     }
     h1 {
       font-size: clamp(1.7rem,4vw,2.6rem); font-weight:800;
-      color: var(--cardinal);
+      background: linear-gradient(135deg,#818cf8,var(--cyan));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
     }
     .subtitle { color:var(--text2); font-size:.9rem; margin-top:8px; }
     .proto-pills { display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin-top:16px; }
     .proto-pill { font-size:.7rem;font-weight:600;padding:3px 11px;border-radius:20px;border:1px solid; }
-    .pp-vmess  { border-color:var(--cardinal); color:var(--cardinal); background:var(--cardinal-muted); }
-    .pp-vless  { border-color:var(--cardinal-l); color:var(--cardinal-l); background:rgba(184,58,75,.08); }
-    .pp-ws     { border-color:#651C32; color:#651C32; background:rgba(101,28,50,.08); }
-    .pp-grpc   { border-color:var(--orange); color:var(--orange); background:rgba(233,131,0,.08); }
-    .pp-http   { border-color:var(--emerald); color:var(--emerald); background:rgba(0,155,118,.08); }
-    .pp-xhttp  { border-color:#53284F; color:#53284F; background:rgba(83,40,79,.08); }
-    .pp-tls    { border-color:var(--amber); color:var(--amber); background:rgba(233,131,0,.08); }
+    .pp-vmess  { border-color:#818cf8; color:#818cf8; background:rgba(99,102,241,.1); }
+    .pp-vless  { border-color:var(--cyan); color:var(--cyan); background:rgba(6,182,212,.1); }
+    .pp-ws     { border-color:var(--violet); color:var(--violet); background:rgba(139,92,246,.1); }
+    .pp-grpc   { border-color:#fb923c; color:#fb923c; background:rgba(251,146,60,.1); }
+    .pp-http   { border-color:var(--emerald); color:var(--emerald); background:rgba(16,185,129,.1); }
+    .pp-xhttp  { border-color:#f472b6; color:#f472b6; background:rgba(244,114,182,.1); }
+    .pp-tls    { border-color:var(--amber); color:var(--amber); background:rgba(245,158,11,.1); }
 
     /* ── Tab Nav ────────────────────────────────── */
     .tab-nav {
       display: flex; gap: 4px;
-      background: var(--surface);
+      background: rgba(0,0,0,.3);
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 6px;
       margin: 24px 0 20px;
-      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
     }
     .tab-btn {
       flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -107,11 +89,11 @@
       font-size: .92rem; font-weight: 600; font-family: inherit;
       color: var(--text2); background: transparent; transition: all .25s;
     }
-    .tab-btn:hover { color: var(--cardinal); background: var(--cardinal-muted); }
+    .tab-btn:hover { color: var(--text); background: rgba(99,102,241,.1); }
     .tab-btn.active {
       color: #fff;
-      background: linear-gradient(135deg, var(--cardinal), var(--cardinal-d));
-      box-shadow: 0 4px 14px rgba(140,21,21,.28);
+      background: linear-gradient(135deg, var(--indigo), var(--indigo-d));
+      box-shadow: 0 4px 16px rgba(99,102,241,.4);
     }
     .tab-pane.hidden { display: none !important; }
 
@@ -120,12 +102,13 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 20px; padding: 22px;
-      box-shadow: var(--shadow);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 8px 32px rgba(0,0,0,.3);
       transition: border-color .3s, box-shadow .3s;
     }
-    .card:hover { border-color: var(--border-h); box-shadow: var(--shadow-lg); }
+    .card:hover { border-color: var(--border-h); box-shadow: 0 12px 48px rgba(99,102,241,.1); }
     .card-head { display:flex;align-items:center;gap:10px;margin-bottom:16px; }
-    .card-icon { width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;color:#fff; }
+    .card-icon { width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0; }
     .card-title { font-size:.98rem;font-weight:700; }
     .card-sub { font-size:.75rem;color:var(--text2);margin-top:2px; }
 
@@ -137,15 +120,15 @@
 
     /* ── Inputs ─────────────────────────────────── */
     textarea, input[type=text], input[type=number] {
-      width:100%; background:var(--surface2);
-      border:1px solid rgba(140,21,21,.18); border-radius:11px;
+      width:100%; background:rgba(0,0,0,.4);
+      border:1px solid rgba(99,102,241,.2); border-radius:11px;
       color:var(--text); padding:12px 14px;
       font-family:var(--mono); font-size:.82rem; line-height:1.6;
       outline:none; transition:border-color .25s,box-shadow .25s;
     }
     textarea { resize:vertical; direction:ltr; text-align:left; }
     input[type=text],input[type=number] { direction:ltr; text-align:left; }
-    textarea:focus,input:focus { border-color:var(--cardinal);box-shadow:0 0 0 3px rgba(140,21,21,.12); }
+    textarea:focus,input:focus { border-color:var(--indigo);box-shadow:0 0 0 3px rgba(99,102,241,.18); }
     textarea::placeholder,input::placeholder { color:var(--text3); }
 
     .help { font-size:.74rem;color:var(--text3);margin-top:7px;line-height:1.5; }
@@ -159,63 +142,63 @@
       transition:transform .2s,box-shadow .2s;font-family:inherit;white-space:nowrap;
     }
     .btn:active{transform:scale(.97)!important}
-    .btn-indigo{background:linear-gradient(135deg,var(--cardinal),var(--cardinal-d));color:#fff;box-shadow:0 4px 16px rgba(140,21,21,.25);}
-    .btn-indigo:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(140,21,21,.35)}
-    .btn-emerald{background:linear-gradient(135deg,var(--emerald),#007C5A);color:#fff;box-shadow:0 4px 16px rgba(0,155,118,.25);}
-    .btn-emerald:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(0,155,118,.35)}
-    .btn-violet{background:linear-gradient(135deg,#651C32,#53284F);color:#fff;box-shadow:0 4px 16px rgba(101,28,50,.25);}
-    .btn-violet:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(101,28,50,.35)}
-    .btn-rose{background:linear-gradient(135deg,var(--rose),#C43A28);color:#fff;box-shadow:0 4px 14px rgba(224,79,57,.28);}
+    .btn-indigo{background:linear-gradient(135deg,var(--indigo),var(--indigo-d));color:#fff;box-shadow:0 4px 20px rgba(99,102,241,.4);}
+    .btn-indigo:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(99,102,241,.55)}
+    .btn-emerald{background:linear-gradient(135deg,var(--emerald),#059669);color:#fff;box-shadow:0 4px 20px rgba(16,185,129,.4);}
+    .btn-emerald:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(16,185,129,.55)}
+    .btn-violet{background:linear-gradient(135deg,var(--violet),#6d28d9);color:#fff;box-shadow:0 4px 20px rgba(139,92,246,.4);}
+    .btn-violet:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(139,92,246,.55)}
+    .btn-rose{background:linear-gradient(135deg,var(--rose),#be123c);color:#fff;box-shadow:0 4px 16px rgba(244,63,94,.35);}
     .btn-rose:hover{transform:translateY(-2px)}
-    .btn-ghost{background:var(--surface);color:var(--text2);border:1px solid var(--border);}
-    .btn-ghost:hover{background:var(--cardinal-muted);color:var(--cardinal);border-color:var(--border-h)}
+    .btn-ghost{background:rgba(255,255,255,.06);color:var(--text2);border:1px solid rgba(255,255,255,.1);}
+    .btn-ghost:hover{background:rgba(255,255,255,.11);color:var(--text)}
     .btn-sm{padding:6px 13px;font-size:.76rem;border-radius:8px}
     .btn-full{width:100%;margin-top:12px}
 
     /* ── Config fields (tab1) ────────────────────── */
     .fields-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:9px; }
     .field-box {
-      background:var(--surface2);border:1px solid rgba(140,21,21,.12);
+      background:rgba(0,0,0,.3);border:1px solid rgba(99,102,241,.12);
       border-radius:11px;padding:10px 13px;cursor:pointer;
       transition:border-color .2s,background .2s;overflow:hidden;
     }
-    .field-box:hover{border-color:rgba(140,21,21,.35);background:var(--cardinal-muted)}
+    .field-box:hover{border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.07)}
     .field-lbl{font-size:.66rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:4px;font-weight:600}
     .field-val{font-family:var(--mono);font-size:.82rem;color:var(--text);word-break:break-all;direction:ltr;text-align:left}
-    .fhi{color:var(--cardinal);font-weight:700} .fhi2{color:var(--cardinal-l)} .fhi3{color:var(--emerald)}
+    .fhi{color:var(--cyan);font-weight:700} .fhi2{color:#818cf8} .fhi3{color:#34d399}
     .badge-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
     .badge{display:inline-flex;align-items:center;font-size:.71rem;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid}
-    .bv{color:var(--cardinal);border-color:rgba(140,21,21,.35);background:var(--cardinal-muted)}
-    .bc{color:var(--cardinal-l);border-color:rgba(184,58,75,.35);background:rgba(184,58,75,.08)}
-    .bg2{color:var(--emerald);border-color:rgba(0,155,118,.35);background:rgba(0,155,118,.08)}
-    .bp{color:#651C32;border-color:rgba(101,28,50,.35);background:rgba(101,28,50,.08)}
-    .ba{color:var(--amber);border-color:rgba(233,131,0,.35);background:rgba(233,131,0,.08)}
-    .br{color:var(--rose);border-color:rgba(224,79,57,.35);background:rgba(224,79,57,.08)}
-    .bm{color:var(--text2);border-color:rgba(83,86,90,.2);background:rgba(83,86,90,.06)}
+    .bv{color:#818cf8;border-color:rgba(129,140,248,.4);background:rgba(129,140,248,.1)}
+    .bc{color:var(--cyan);border-color:rgba(6,182,212,.4);background:rgba(6,182,212,.1)}
+    .bg2{color:#34d399;border-color:rgba(52,211,153,.4);background:rgba(52,211,153,.1)}
+    .bp{color:#c084fc;border-color:rgba(192,132,252,.4);background:rgba(192,132,252,.1)}
+    .ba{color:var(--amber);border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.1)}
+    .br{color:#fb7185;border-color:rgba(251,113,133,.4);background:rgba(251,113,133,.1)}
+    .bm{color:var(--text2);border-color:rgba(148,163,184,.2);background:rgba(148,163,184,.05)}
     .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
     @media(max-width:640px){.stats-row{grid-template-columns:repeat(2,1fr)}}
-    .stat-box{background:var(--surface2);border:1px solid rgba(140,21,21,.12);border-radius:13px;padding:13px;text-align:center}
-    .stat-val{font-size:1.5rem;font-weight:800;color:var(--cardinal);line-height:1.2}
+    .stat-box{background:rgba(0,0,0,.25);border:1px solid rgba(99,102,241,.12);border-radius:13px;padding:13px;text-align:center}
+    .stat-val{font-size:1.5rem;font-weight:800;background:linear-gradient(135deg,var(--indigo),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2}
     .stat-lbl{font-size:.7rem;color:var(--text3);margin-top:3px}
     .gen-actions{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:wrap}
-    .count-pill{background:var(--cardinal-muted);color:var(--cardinal);padding:4px 13px;border-radius:20px;font-size:.8rem;font-weight:700;border:1px solid rgba(140,21,21,.2)}
+    .count-pill{background:rgba(99,102,241,.18);color:#818cf8;padding:4px 13px;border-radius:20px;font-size:.8rem;font-weight:700;border:1px solid rgba(99,102,241,.25)}
     .gen-list{display:flex;flex-direction:column;gap:6px;max-height:500px;overflow-y:auto;padding-right:3px}
     .gen-list::-webkit-scrollbar{width:3px}
-    .gen-list::-webkit-scrollbar-thumb{background:rgba(140,21,21,.3);border-radius:3px}
-    .gen-item{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid rgba(140,21,21,.1);border-radius:10px;padding:9px 12px;animation:slide-in .25s ease both;transition:border-color .2s}
-    .gen-item:hover{border-color:rgba(140,21,21,.3)}
+    .gen-list::-webkit-scrollbar-thumb{background:rgba(99,102,241,.4);border-radius:3px}
+    .gen-item{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.3);border:1px solid rgba(99,102,241,.12);border-radius:10px;padding:9px 12px;animation:slide-in .25s ease both;transition:border-color .2s}
+    .gen-item:hover{border-color:rgba(99,102,241,.35)}
     @keyframes slide-in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
     .gen-num{font-size:.7rem;color:var(--text3);min-width:22px;text-align:center;font-weight:700;direction:ltr}
-    .gen-ip{font-family:var(--mono);font-size:.8rem;color:var(--cardinal);font-weight:700;min-width:130px;direction:ltr}
+    .gen-ip{font-family:var(--mono);font-size:.8rem;color:var(--cyan);font-weight:700;min-width:130px;direction:ltr}
     .gen-cfg{flex:1;font-family:var(--mono);font-size:.7rem;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr}
 
     /* ── Accordion ───────────────────────────────── */
-    .accrd { border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:10px;background:var(--surface); }
+    .accrd { border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:10px;background:rgba(0,0,0,.2); }
     .accrd-head {
       display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;
-      background:var(--cardinal-muted);transition:background .2s;user-select:none;
+      background:rgba(99,102,241,.05);transition:background .2s;user-select:none;
     }
-    .accrd-head:hover{background:rgba(140,21,21,.12)}
+    .accrd-head:hover{background:rgba(99,102,241,.12)}
     .accrd-toggle{font-size:.75rem;color:var(--text3);transition:transform .3s;margin-right:auto;flex-shrink:0}
     .accrd-head.open .accrd-toggle{transform:rotate(180deg)}
     .accrd-title{font-size:.87rem;font-weight:700;color:var(--text)}
@@ -224,16 +207,16 @@
     .accrd-body.open{max-height:600px}
     .accrd-inner{padding:10px 14px 14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:5px;overflow-y:auto;max-height:520px}
     .accrd-inner::-webkit-scrollbar{width:3px}
-    .accrd-inner::-webkit-scrollbar-thumb{background:rgba(140,21,21,.25);border-radius:3px}
+    .accrd-inner::-webkit-scrollbar-thumb{background:rgba(99,102,241,.35);border-radius:3px}
 
     /* ── Checkboxes ─────────────────────────────── */
     .chk-row {
       display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:8px;
       cursor:pointer;transition:background .15s;
     }
-    .chk-row:hover{background:var(--cardinal-muted)}
+    .chk-row:hover{background:rgba(99,102,241,.1)}
     .chk-row input[type=checkbox]{
-      width:15px;height:15px;accent-color:var(--cardinal);cursor:pointer;flex-shrink:0;
+      width:15px;height:15px;accent-color:var(--indigo);cursor:pointer;flex-shrink:0;
     }
     .chk-label{font-family:var(--mono);font-size:.78rem;color:var(--text);direction:ltr;text-align:left;flex:1}
     .chk-desc{font-size:.68rem;color:var(--text3);flex-shrink:0}
@@ -246,10 +229,10 @@
     /* ── Selected summary bar ────────────────────── */
     .sel-bar{
       display:flex;align-items:center;justify-content:space-between;
-      background:var(--cardinal-muted);border:1px solid rgba(140,21,21,.2);
+      background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.25);
       border-radius:13px;padding:12px 18px;gap:10px;flex-wrap:wrap;margin-bottom:14px;
     }
-    .sel-count{font-size:.9rem;font-weight:700;color:var(--cardinal)}
+    .sel-count{font-size:.9rem;font-weight:700;color:var(--cyan)}
     .sel-desc{font-size:.78rem;color:var(--text2)}
 
     /* ── Test Panel ──────────────────────────────── */
@@ -259,11 +242,11 @@
 
     /* ── Progress ────────────────────────────────── */
     .prog-wrap{margin:14px 0}
-    .prog-bar-bg{height:8px;background:#EAEAEA;border-radius:4px;overflow:hidden;margin:6px 0}
-    .prog-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--cardinal),var(--cardinal-l));transition:width .3s ease;width:0}
+    .prog-bar-bg{height:8px;background:rgba(0,0,0,.4);border-radius:4px;overflow:hidden;margin:6px 0}
+    .prog-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--indigo),var(--cyan));transition:width .3s ease;width:0}
     .prog-info{display:flex;justify-content:space-between;font-size:.75rem;color:var(--text3)}
     .test-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
-    .ts-box{background:var(--surface2);border:1px solid rgba(140,21,21,.1);border-radius:10px;padding:10px;text-align:center}
+    .ts-box{background:rgba(0,0,0,.25);border-radius:10px;padding:10px;text-align:center}
     .ts-val{font-size:1.3rem;font-weight:800;line-height:1.1}
     .ts-lbl{font-size:.65rem;color:var(--text3);margin-top:2px}
     .tv-ok{color:var(--emerald)} .tv-err{color:var(--rose)} .tv-to{color:var(--amber)}
@@ -277,9 +260,9 @@
       font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;
       padding:6px 8px;border-bottom:1px solid var(--border);text-align:right;font-weight:600;
     }
-    .res-table td{padding:6px 8px;border-bottom:1px solid rgba(140,21,21,.08);vertical-align:middle}
+    .res-table td{padding:6px 8px;border-bottom:1px solid rgba(99,102,241,.07);vertical-align:middle}
     .res-table tr:last-child td{border-bottom:none}
-    .res-table tr:hover td{background:var(--cardinal-muted)}
+    .res-table tr:hover td{background:rgba(99,102,241,.05)}
     .res-ip{font-family:var(--mono);font-size:.8rem;color:var(--text);direction:ltr;text-align:left}
     .lat-cell{min-width:110px}
     .lat-bar-wrap{display:flex;align-items:center;gap:6px;direction:ltr}
@@ -294,17 +277,17 @@
     .res-status{font-size:.75rem}
     .res-table-wrap{max-height:460px;overflow-y:auto;padding-right:2px}
     .res-table-wrap::-webkit-scrollbar{width:3px}
-    .res-table-wrap::-webkit-scrollbar-thumb{background:rgba(140,21,21,.25);border-radius:3px}
+    .res-table-wrap::-webkit-scrollbar-thumb{background:rgba(99,102,241,.35);border-radius:3px}
     .res-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 
     /* ── User list management ────────────────────── */
     .my-list-item{
       display:flex;align-items:center;justify-content:space-between;gap:8px;
-      background:var(--surface2);border:1px solid var(--border);border-radius:11px;
+      background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:11px;
       padding:10px 14px;cursor:pointer;transition:border-color .2s,background .2s;
     }
-    .my-list-item:hover{border-color:var(--border-h);background:var(--cardinal-muted)}
-    .my-list-item.selected{border-color:rgba(140,21,21,.45);background:rgba(140,21,21,.1)}
+    .my-list-item:hover{border-color:var(--border-h);background:rgba(99,102,241,.07)}
+    .my-list-item.selected{border-color:rgba(6,182,212,.5);background:rgba(6,182,212,.07)}
     .mli-name{font-size:.85rem;font-weight:700;color:var(--text)}
     .mli-count{font-size:.72rem;color:var(--text3);margin-top:2px}
     .mli-actions{display:flex;gap:5px;flex-shrink:0}
@@ -312,14 +295,14 @@
     /* ── Add list modal ─────────────────────────── */
     .modal-overlay{
       position:fixed;inset:0;z-index:500;
-      background:rgba(46,45,41,.45);backdrop-filter:blur(4px);
+      background:rgba(0,0,0,.7);backdrop-filter:blur(6px);
       display:flex;align-items:center;justify-content:center;padding:20px;
     }
     .modal-overlay.hidden{display:none!important}
     .modal{
-      background:var(--surface);border:1px solid var(--border-h);
+      background:rgba(13,18,41,.97);border:1px solid var(--border-h);
       border-radius:20px;padding:28px;width:100%;max-width:500px;
-      box-shadow:0 20px 50px rgba(46,45,41,.15);
+      box-shadow:0 20px 60px rgba(0,0,0,.6);
     }
     .modal-title{font-size:1.1rem;font-weight:700;margin-bottom:18px;color:var(--text)}
     .modal-row{margin-bottom:14px}
@@ -330,12 +313,12 @@
     #toasts{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:7px;pointer-events:none}
     .toast{
       display:flex;align-items:center;gap:9px;padding:11px 18px;border-radius:12px;
-      background:var(--surface);border:1px solid rgba(140,21,21,.2);
-      color:var(--text);font-size:.86rem;font-weight:500;
-      box-shadow:var(--shadow-lg);animation:toast-in .28s ease;
+      background:rgba(13,18,41,.97);border:1px solid rgba(99,102,241,.3);
+      color:var(--text);font-size:.86rem;font-weight:500;backdrop-filter:blur(20px);
+      box-shadow:0 8px 32px rgba(0,0,0,.4);animation:toast-in .28s ease;
       pointer-events:all;min-width:220px;max-width:360px;
     }
-    .toast.ok{border-color:rgba(0,155,118,.4)}.toast.err{border-color:rgba(224,79,57,.4)}.toast.wrn{border-color:rgba(233,131,0,.4)}
+    .toast.ok{border-color:rgba(16,185,129,.5)}.toast.err{border-color:rgba(244,63,94,.5)}.toast.wrn{border-color:rgba(245,158,11,.5)}
     @keyframes toast-in{from{opacity:0;transform:translateY(-14px) scale(.95)}to{opacity:1;transform:none}}
     @keyframes toast-out{from{opacity:1}to{opacity:0;transform:translateY(-10px) scale(.95)}}
 
@@ -343,23 +326,27 @@
     .empty{text-align:center;padding:40px 20px;color:var(--text3)}
     .empty-icon{font-size:2.8rem;margin-bottom:10px;opacity:.45;display:block}
 
-    footer{text-align:center;padding:22px;color:var(--text3);font-size:.78rem;border-top:1px solid var(--border);margin-top:20px}
+    footer{text-align:center;padding:22px;color:var(--text3);font-size:.78rem}
+    footer a{color:var(--cyan);text-decoration:none}
+    footer a:hover{text-decoration:underline}
+    .hdr-tools{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+    .hdr-tools a{padding:6px 14px;font-size:.76rem}
     .hidden{display:none!important}
     .mt10{margin-top:10px} .mt14{margin-top:14px}
-    .divider{height:1px;background:rgba(140,21,21,.12);margin:14px 0}
+    .divider{height:1px;background:rgba(99,102,241,.15);margin:14px 0}
 
     /* ── Maker Mode Toggle ───────────────────────── */
-    .mode-toggle{display:flex;gap:3px;background:#EAEAEA;border-radius:10px;padding:3px;flex-shrink:0}
+    .mode-toggle{display:flex;gap:3px;background:rgba(0,0,0,.35);border-radius:10px;padding:3px;flex-shrink:0}
     .mode-btn{padding:5px 12px;border-radius:7px;border:none;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;color:var(--text2);background:transparent;transition:all .2s;white-space:nowrap}
-    .mode-btn.active{background:var(--cardinal);color:#fff;box-shadow:0 2px 8px rgba(140,21,21,.25)}
-    .mode-btn:hover:not(.active){color:var(--cardinal);background:var(--cardinal-muted)}
+    .mode-btn.active{background:var(--indigo);color:#fff;box-shadow:0 2px 8px rgba(99,102,241,.4)}
+    .mode-btn:hover:not(.active){color:var(--text);background:rgba(99,102,241,.15)}
 
     /* ── Maker Range Selector ────────────────────── */
     .maker-ranges-scroll{max-height:300px;overflow-y:auto;padding-right:3px;margin-bottom:10px}
     .maker-ranges-scroll::-webkit-scrollbar{width:3px}
-    .maker-ranges-scroll::-webkit-scrollbar-thumb{background:rgba(140,21,21,.3);border-radius:3px}
-    .maker-summary{display:flex;align-items:center;justify-content:space-between;background:var(--cardinal-muted);border:1px solid rgba(140,21,21,.18);border-radius:9px;padding:7px 13px;margin-bottom:10px;font-size:.8rem}
-    .maker-summary-count{font-weight:700;color:var(--cardinal)}
+    .maker-ranges-scroll::-webkit-scrollbar-thumb{background:rgba(99,102,241,.4);border-radius:3px}
+    .maker-summary{display:flex;align-items:center;justify-content:space-between;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:9px;padding:7px 13px;margin-bottom:10px;font-size:.8rem}
+    .maker-summary-count{font-weight:700;color:var(--indigo)}
     .maker-count-row{display:flex;align-items:flex-end;gap:10px;margin-top:4px}
     .maker-count-row>div{flex:1}
     .maker-count-row .btn{align-self:stretch;padding:10px 18px}
@@ -367,65 +354,12 @@
     /* ── Steps (tab1) ────────────────────────────── */
     .steps-bar{display:flex;align-items:center;justify-content:center;gap:0;margin:20px 0 28px}
     .step-node{display:flex;flex-direction:column;align-items:center;gap:5px}
-    .step-circle{width:36px;height:36px;border-radius:50%;background:var(--cardinal-muted);border:2px solid rgba(140,21,21,.25);display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;color:var(--cardinal);transition:all .3s}
-    .step-circle.active{background:var(--cardinal);border-color:var(--cardinal);color:#fff;box-shadow:0 0 14px rgba(140,21,21,.3)}
+    .step-circle{width:36px;height:36px;border-radius:50%;background:rgba(99,102,241,.15);border:2px solid rgba(99,102,241,.35);display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;color:var(--indigo);transition:all .3s}
+    .step-circle.active{background:var(--indigo);border-color:var(--indigo);color:#fff;box-shadow:0 0 16px rgba(99,102,241,.6)}
     .step-label{font-size:.73rem;color:var(--text2);white-space:nowrap}
-    .step-line{width:55px;height:2px;background:rgba(140,21,21,.15);margin-bottom:22px}
+    .step-line{width:55px;height:2px;background:rgba(99,102,241,.2);margin-bottom:22px}
     @media(max-width:600px){.steps-bar{display:none}}
-
-    /* ── Toggle switch ───────────────────────────── */
-    .toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0}
-    .toggle-lbl{font-size:.8rem;color:var(--text2)}
-    .toggle{position:relative;width:44px;height:24px;flex-shrink:0}
-    .toggle input{opacity:0;width:0;height:0}
-    .toggle-slider{position:absolute;inset:0;background:#D5D5D4;border-radius:24px;cursor:pointer;transition:.25s}
-    .toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
-    .toggle input:checked+.toggle-slider{background:var(--cardinal)}
-    .toggle input:checked+.toggle-slider::before{transform:translateX(20px)}
-
-    /* ── Config editor ───────────────────────────── */
-    .editor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
-    .settings-bar{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:14px}
-    .filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-    .filter-row input[type=number]{width:90px;padding:6px 10px;font-size:.78rem}
-
-    /* ── QR Modal ──────────────────────────────── */
-    #qrModal .modal{max-width:380px;text-align:center}
-    #qrCanvas{margin:12px auto;border-radius:12px;background:#fff;padding:12px}
-    #qrConfigText{font-family:var(--mono);font-size:.65rem;color:var(--text3);word-break:break-all;direction:ltr;text-align:left;max-height:80px;overflow-y:auto;margin-top:8px}
-
-    /* ── Header toolbar ─────────────────────────── */
-    .hdr-tools{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
-    .hdr-tools .btn{padding:6px 14px;font-size:.76rem}
-    select.hdr-select{background:var(--surface2);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:6px 10px;font-size:.76rem;font-family:inherit}
-
-    /* ── Drop zone ──────────────────────────────── */
-    .dropzone{border:2px dashed var(--border);border-radius:12px;padding:16px;text-align:center;color:var(--text3);font-size:.78rem;transition:border-color .2s,background .2s;margin-bottom:10px}
-    .dropzone.dragover{border-color:var(--cardinal);background:var(--cardinal-muted);color:var(--cardinal)}
-
-    /* ── Latency chart ──────────────────────────── */
-    .lat-chart-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px}
-    .lat-chart-wrap canvas{width:100%;height:80px;display:block}
-
-    /* ── Warnings / tags ────────────────────────── */
-    .warn-box{background:rgba(233,131,0,.12);border:1px solid rgba(233,131,0,.35);border-radius:10px;padding:10px 14px;font-size:.76rem;color:var(--amber);margin-bottom:12px}
-    .tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-    .tag{font-size:.68rem;padding:2px 8px;border-radius:12px;background:var(--cardinal-muted);color:var(--cardinal);border:1px solid var(--border)}
-
-    /* ── History / preset list ──────────────────── */
-    .mini-list{max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:5px}
-    .mini-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:.76rem}
-    .mini-item span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-    /* ── JSON preview ───────────────────────────── */
-    #jsonPreviewText{font-family:var(--mono);font-size:.72rem;direction:ltr;text-align:left;max-height:400px;overflow:auto;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;white-space:pre-wrap;word-break:break-all}
-
-    /* ── Search bar ─────────────────────────────── */
-    .search-bar{margin-bottom:10px}
-    .search-bar input{font-family:inherit;font-size:.82rem}
   </style>
-  <link rel="manifest" href="manifest.json" />
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js" defer></script>
 </head>
 <body>
 
@@ -433,57 +367,6 @@
 <div id="toasts"></div>
 
 <!-- ── Add List Modal ────────────────────────────── -->
-<!-- ── QR Modal ─────────────────────────────────── -->
-<div class="modal-overlay hidden" id="qrModal" onclick="if(event.target===this)closeQrModal()">
-  <div class="modal">
-    <div class="modal-title">📱 QR Code</div>
-    <canvas id="qrCanvas"></canvas>
-    <div id="qrConfigText"></div>
-    <div class="modal-actions" style="justify-content:center">
-      <button class="btn btn-ghost" onclick="closeQrModal()">بستن</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay hidden" id="importSubModal" onclick="if(event.target===this)closeImportSubModal()">
-  <div class="modal" style="max-width:560px">
-    <div class="modal-title">📥 Import Subscription</div>
-    <div class="modal-row">
-      <label>لینک subscription یا محتوای Base64</label>
-      <textarea id="importSubInput" rows="8" placeholder="https://... یا محتوای Base64"></textarea>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeImportSubModal()">انصراف</button>
-      <button class="btn btn-indigo" onclick="doImportSubscription()">استخراج لینک‌ها</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay hidden" id="jsonPreviewModal" onclick="if(event.target===this)closeJsonPreview()">
-  <div class="modal" style="max-width:640px">
-    <div class="modal-title" id="jsonPreviewTitle">JSON Preview</div>
-    <pre id="jsonPreviewText"></pre>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="copyJsonPreview()">📋 کپی</button>
-      <button class="btn btn-ghost" onclick="closeJsonPreview()">بستن</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay hidden" id="presetModal" onclick="if(event.target===this)closePresetModal()">
-  <div class="modal">
-    <div class="modal-title">💾 Preset</div>
-    <div class="modal-row">
-      <label>نام preset</label>
-      <input type="text" id="presetName" placeholder="مثال: WS-TLS-443" />
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closePresetModal()">انصراف</button>
-      <button class="btn btn-indigo" onclick="saveCurrentPreset()">ذخیره</button>
-    </div>
-  </div>
-</div>
-
 <div class="modal-overlay hidden" id="listModal">
   <div class="modal">
     <div class="modal-title" id="modalTitle">➕ افزودن لیست جدید</div>
@@ -497,16 +380,10 @@
     </div>
     <div class="modal-row">
       <label>آی‌پی‌ها و رنج‌ها (هر خط یک مورد)</label>
-      <div class="dropzone" id="listDropzone">فایل .txt را اینجا بکشید یا رها کنید</div>
       <textarea id="listIPs" rows="8" placeholder="1.2.3.4
 5.6.7.0/24
 8.9.10.1-8.9.10.50
 example.com"></textarea>
-      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
-        <button type="button" class="btn btn-ghost btn-sm" onclick="bulkDedupListIPs()">حذف تکراری</button>
-        <button type="button" class="btn btn-ghost btn-sm" onclick="bulkSortListIPs()">مرتب‌سازی</button>
-        <label class="btn btn-ghost btn-sm" style="cursor:pointer">📂 Import<input type="file" accept=".txt" hidden onchange="importFileToListInput(this)" /></label>
-      </div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeListModal()">انصراف</button>
@@ -521,16 +398,14 @@ example.com"></textarea>
   <header>
     <div class="logo-ring">⚡</div>
     <h1>V2Ray Config Maker</h1>
-    <p class="subtitle" data-i18n="subtitle">استخراج · تحلیل · تولید کانفیگ · مدیریت IP · تست تاخیر</p>
+    <p class="subtitle">استخراج · تحلیل · تولید کانفیگ · مدیریت IP · تست تاخیر</p>
     <div class="hdr-tools">
-      <button class="btn btn-ghost btn-sm" id="themeToggle" onclick="toggleTheme()" title="تم">🌙</button>
-      <button class="btn btn-ghost btn-sm" id="langToggle" onclick="toggleLang()">EN</button>
+      <a class="btn btn-ghost btn-sm" href="https://github.com/alireza-aminzadeh/cconfig-maker" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a class="btn btn-ghost btn-sm" href="https://alireza-aminzadeh.github.io/cconfig-maker/">Live</a>
     </div>
     <div class="proto-pills">
       <span class="proto-pill pp-vmess">VMess</span>
       <span class="proto-pill pp-vless">VLess</span>
-      <span class="proto-pill pp-trojan" style="border-color:#651C32;color:#651C32;background:rgba(101,28,50,.08)">Trojan</span>
-      <span class="proto-pill pp-ss" style="border-color:#009B76;color:#009B76;background:rgba(0,155,118,.08)">SS</span>
       <span class="proto-pill pp-ws">WebSocket</span>
       <span class="proto-pill pp-http">HTTP Upgrade</span>
       <span class="proto-pill pp-xhttp">XHTTP</span>
@@ -563,25 +438,21 @@ example.com"></textarea>
       <!-- Config input -->
       <div class="card">
         <div class="card-head">
-          <div class="card-icon" style="background:linear-gradient(135deg,#8C1515,#820000)">⚙️</div>
-          <div><div class="card-title">کانفیگ اصلی</div><div class="card-sub">VMess · VLess · Trojan · SS · Hysteria2 · Tuic</div></div>
+          <div class="card-icon" style="background:linear-gradient(135deg,#6366f1,#4338ca)">⚙️</div>
+          <div><div class="card-title">کانفیگ اصلی</div><div class="card-sub">VMess یا VLess بچسبانید</div></div>
         </div>
         <textarea id="configInput" rows="9" placeholder="مثال:
 vmess://eyJ2IjoiMiIsInBzIjoiVGVzdCIsImFkZCI6IjEuMi4zLjQiLCJwb3J0IjoiNDQzIiwiaWQiOiJ1dWlkIiwiYWlkIjoiMCIsInNjeSI6ImF1dG8iLCJuZXQiOiJ3cyIsInR5cGUiOiJub25lIiwiaG9zdCI6ImV4YW1wbGUuY29tIiwicGF0aCI6Ii93cyIsInRscyI6InRscyIsInNuaSI6ImV4YW1wbGUuY29tIn0=
 
 vless://uuid@1.2.3.4:443?type=ws&security=tls&host=ex.com&path=%2Fws&sni=ex.com#Name"></textarea>
-        <p class="help">پروتکل‌ها: <b>tcp · ws · grpc · h2 · httpupgrade · xhttp</b> &nbsp;|&nbsp; امنیت: <b>tls · xtls · reality</b> &nbsp;|&nbsp; <b>Ctrl+Enter</b> تحلیل</p>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-indigo" style="flex:1" onclick="parseConfig()">🔍 &nbsp;تحلیل و استخراج کانفیگ</button>
-          <button class="btn btn-ghost" onclick="openImportSubModal()">📥 Subscription</button>
-        </div>
-        <div id="configWarnings" class="hidden"></div>
+        <p class="help">پروتکل‌ها: <b>tcp · ws · grpc · h2 · httpupgrade · xhttp</b> &nbsp;|&nbsp; امنیت: <b>tls · xtls · reality</b></p>
+        <button class="btn btn-indigo btn-full" onclick="parseConfig()">🔍 &nbsp;تحلیل و استخراج کانفیگ</button>
       </div>
 
       <!-- IP Range Selector Card -->
       <div class="card">
         <div class="card-head" style="flex-wrap:wrap;gap:8px">
-          <div class="card-icon" style="background:linear-gradient(135deg,#B83A4B,#8C1515)">🌐</div>
+          <div class="card-icon" style="background:linear-gradient(135deg,#06b6d4,#0891b2)">🌐</div>
           <div style="flex:1;min-width:0">
             <div class="card-title">آی‌پی / رنج</div>
             <div class="card-sub" id="makerModeSubtitle">انتخاب از رنج‌های ثبت‌شده در سیستم</div>
@@ -625,48 +496,10 @@ example.com
       </div>
     </div>
 
-    <!-- Config editor & settings -->
-    <div class="card hidden" id="editorCard" style="margin-bottom:18px">
-      <div class="card-head">
-        <div class="card-icon" style="background:linear-gradient(135deg,#E98300,#C76D00)">✏️</div>
-        <div><div class="card-title">ویرایش قبل از تولید</div><div class="card-sub">فیلدها را تغییر دهید — روی همه کانفیگ‌های خروجی اعمال می‌شود</div></div>
-      </div>
-      <div class="editor-grid">
-        <div><label class="inp-label">نام (Remark)</label><input type="text" id="editName" placeholder="نام کانفیگ" /></div>
-        <div><label class="inp-label">پورت</label><input type="text" id="editPort" placeholder="443" /></div>
-        <div><label class="inp-label">Host</label><input type="text" id="editHost" placeholder="example.com" /></div>
-        <div><label class="inp-label">Path</label><input type="text" id="editPath" placeholder="/ws" /></div>
-        <div><label class="inp-label">SNI</label><input type="text" id="editSni" placeholder="example.com" /></div>
-        <div><label class="inp-label">Flow (VLess)</label><input type="text" id="editFlow" placeholder="xtls-rprx-vision" /></div>
-        <div><label class="inp-label">قالب نام‌گذاری</label><input type="text" id="nameTemplate" placeholder="{name}-{ip}" title="{name} {ip} {index} {port} {latency}" onchange="saveSettings()" /></div>
-      </div>
-      <p class="help mt10">قالب نام: <b>{name}</b> · <b>{ip}</b> · <b>{index}</b> · <b>{port}</b> · <b>{latency}</b></p>
-      <div class="settings-bar mt10">
-        <div class="toggle-row">
-          <span class="toggle-lbl">دانلود خودکار بعد از تولید</span>
-          <label class="toggle"><input type="checkbox" id="autoExportToggle" checked onchange="saveSettings()" /><span class="toggle-slider"></span></label>
-        </div>
-        <div class="toggle-row">
-          <span class="toggle-lbl">حفظ IP اصلی (فقط جایگزینی address)</span>
-          <label class="toggle"><input type="checkbox" id="keepOriginalIPToggle" onchange="saveSettings()" /><span class="toggle-slider"></span></label>
-        </div>
-      </div>
-      <div class="divider"></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-        <button class="btn btn-ghost btn-sm" onclick="openPresetModal()">💾 ذخیره Preset</button>
-        <select id="presetSelect" class="hdr-select" onchange="loadSelectedPreset(this.value)"><option value="">— بارگذاری Preset —</option></select>
-        <button class="btn btn-ghost btn-sm" onclick="generateRealityKeys()">🔐 تولید Reality Keys</button>
-        <button class="btn btn-ghost btn-sm" onclick="showXrayJsonPreview()">📄 Preview Xray JSON</button>
-      </div>
-      <div id="realityKeysOut" class="help hidden"></div>
-      <div class="inp-label">تاریخچه کانفیگ‌های تولیدشده</div>
-      <div class="mini-list" id="historyList"></div>
-    </div>
-
     <!-- Parsed config -->
     <div class="card hidden" id="parsedCard" style="margin-bottom:18px">
       <div class="card-head">
-        <div class="card-icon" style="background:linear-gradient(135deg,#651C32,#53284F)">📋</div>
+        <div class="card-icon" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed)">📋</div>
         <div><div class="card-title">جزئیات کانفیگ استخراج شده</div><div class="card-sub">روی هر فیلد کلیک کنید تا کپی شود</div></div>
       </div>
       <div id="parsedBody"></div>
@@ -675,24 +508,15 @@ example.com
     <!-- Generated configs -->
     <div class="card hidden" id="genCard">
       <div class="card-head">
-        <div class="card-icon" style="background:linear-gradient(135deg,#009B76,#007C5A)">✨</div>
+        <div class="card-icon" style="background:linear-gradient(135deg,#10b981,#059669)">✨</div>
         <div><div class="card-title">کانفیگ‌های تولید شده</div><div class="card-sub">روی 📋 هر ردیف کلیک کنید برای کپی</div></div>
       </div>
       <div id="statsRow" class="stats-row"></div>
-      <div class="search-bar">
-        <input type="text" id="genSearch" placeholder="جستجو در کانفیگ‌ها..." oninput="filterGeneratedList()" />
-      </div>
       <div class="gen-actions">
         <span class="count-pill" id="genCount">۰ کانفیگ</span>
-        <div style="display:flex;gap:7px;flex-wrap:wrap">
+        <div style="display:flex;gap:7px">
           <button class="btn btn-ghost btn-sm" onclick="copyAll()">📋 کپی همه</button>
-          <button class="btn btn-ghost btn-sm" onclick="copyAllGeneratedIPs()">📋 کپی IPها</button>
-          <button class="btn btn-ghost btn-sm" onclick="downloadAll()">⬇️ .txt</button>
-          <button class="btn btn-ghost btn-sm" onclick="downloadCsv()">📊 CSV</button>
-          <button class="btn btn-ghost btn-sm" onclick="exportSubscription()">🔗 Subscription</button>
-          <button class="btn btn-ghost btn-sm" onclick="exportClash()">⚔️ Clash</button>
-          <button class="btn btn-ghost btn-sm" onclick="exportSingbox()">📦 Sing-box</button>
-          <button class="btn btn-ghost btn-sm" onclick="showQrModal(0)">📱 QR</button>
+          <button class="btn btn-ghost btn-sm" onclick="downloadAll()">⬇️ دانلود .txt</button>
         </div>
       </div>
       <div class="gen-list" id="genList"></div>
@@ -724,7 +548,7 @@ example.com
         <!-- Cloudflare Official -->
         <div class="card" style="padding:14px">
           <div class="card-head" style="margin-bottom:10px">
-            <div class="card-icon" style="background:linear-gradient(135deg,#E04F39,#C43A28);font-size:16px">☁️</div>
+            <div class="card-icon" style="background:linear-gradient(135deg,#f97316,#ea580c);font-size:16px">☁️</div>
             <div><div class="card-title">کتابخانه IP کلادفلر</div><div class="card-sub">رنج‌های رسمی و محبوب</div></div>
           </div>
 
@@ -797,7 +621,7 @@ example.com
         <!-- My Lists -->
         <div class="card" style="padding:14px">
           <div class="card-head" style="margin-bottom:10px">
-            <div class="card-icon" style="background:linear-gradient(135deg,#009B76,#007C5A);font-size:16px">💾</div>
+            <div class="card-icon" style="background:linear-gradient(135deg,#10b981,#059669);font-size:16px">💾</div>
             <div><div class="card-title">لیست‌های من</div><div class="card-sub">ذخیره شده در مرورگر</div></div>
             <button class="btn btn-ghost btn-sm" style="margin-right:auto" onclick="openListModal()">➕ جدید</button>
           </div>
@@ -812,21 +636,13 @@ example.com
       <div>
         <div class="card" style="margin-bottom:18px">
           <div class="card-head">
-            <div class="card-icon" style="background:linear-gradient(135deg,#E98300,#C76D00);font-size:16px">⚡</div>
+            <div class="card-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706);font-size:16px">⚡</div>
             <div><div class="card-title">تنظیمات تست</div><div class="card-sub">پینگ و تاخیر واقعی</div></div>
           </div>
 
           <div class="test-cfg">
             <div>
-              <label class="inp-label">نوع تست</label>
-              <select id="testMode" class="hdr-select" style="width:100%" onchange="saveSettings()">
-                <option value="http">HTTP (no-cors)</option>
-                <option value="https">HTTPS (no-cors)</option>
-                <option value="tcp">TCP probe (favicon)</option>
-              </select>
-            </div>
-            <div>
-              <label class="inp-label">آدرس تست ({ip} · {port} · {path} · {sni})</label>
+              <label class="inp-label">آدرس تست (از {ip} استفاده کنید)</label>
               <input type="text" id="testUrl" value="http://{ip}/" />
             </div>
             <div>
@@ -841,62 +657,22 @@ example.com
               <label class="inp-label">درخواست‌های موازی</label>
               <input type="number" id="testConcurrency" value="15" min="1" max="50" />
             </div>
-            <div>
-              <label class="inp-label">تخمین زمان</label>
-              <div id="testTimeEst" class="help" style="margin:0;padding:10px 0">—</div>
-            </div>
-          </div>
-
-          <div class="settings-bar" style="margin-bottom:10px">
-            <div class="toggle-row">
-              <span class="toggle-lbl">DNS resolve دامنه‌ها قبل از تست</span>
-              <label class="toggle"><input type="checkbox" id="dnsResolveToggle" onchange="saveSettings()" /><span class="toggle-slider"></span></label>
-            </div>
-            <div class="toggle-row">
-              <span class="toggle-lbl">فقط نمایش موفق‌ها در فیلتر</span>
-              <label class="toggle"><input type="checkbox" id="filterOnlySuccessToggle" onchange="filterResultsByLatency();saveSettings()" /><span class="toggle-slider"></span></label>
-            </div>
-          </div>
-
-          <div class="filter-row" style="margin-top:4px">
-            <label class="inp-label" style="margin:0">بهترین N برای pipeline:</label>
-            <input type="number" id="pipelineBestN" value="10" min="1" max="500" />
-            <button class="btn btn-ghost btn-sm" onclick="applyParsedToTest()" title="از کانفیگ تحلیل‌شده URL تست بساز">🔗 اعمال کانفیگ به URL</button>
           </div>
 
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-emerald" id="startTestBtn" onclick="startTest()" style="flex:1">
               ▶ شروع تست
             </button>
-            <button class="btn btn-violet btn-sm" id="testGenBtn" onclick="testAndGenerate()" title="تست → بهترین IPها → تولید کانفیگ">
-              ⚡ تست و تولید
-            </button>
             <button class="btn btn-rose btn-sm hidden" id="stopTestBtn" onclick="stopTest()">
               ⏹ توقف
             </button>
-            <button class="btn btn-ghost btn-sm hidden" id="pauseTestBtn" onclick="togglePauseTest()">
-              ⏸ مکث
-            </button>
-            <button class="btn btn-ghost btn-sm" onclick="retryFailedTests()" title="تست مجدد IPهای timeout/error">
-              🔄 Retry
-            </button>
           </div>
-          <p class="help">تست مرورگر فقط دسترسی HTTP/HTTPS را می‌سنجد — TLS/WebSocket واقعی به backend نیاز دارد.</p>
-        </div>
-
-        <!-- Blacklist -->
-        <div class="card" style="margin-bottom:18px;padding:14px">
-          <div class="card-head" style="margin-bottom:8px">
-            <div class="card-title" style="font-size:.9rem">🚫 Blacklist IP</div>
-          </div>
-          <textarea id="blacklistInput" rows="3" placeholder="هر خط یک IP" onchange="saveBlacklist()"></textarea>
-          <button class="btn btn-ghost btn-sm mt10" onclick="addFailedToBlacklist()">افزودن IPهای ناموفق</button>
         </div>
 
         <!-- Test progress -->
         <div class="card hidden" id="testProgressCard" style="margin-bottom:18px">
           <div class="card-head" style="margin-bottom:10px">
-            <div class="card-icon" style="background:linear-gradient(135deg,#651C32,#53284F);font-size:16px">📡</div>
+            <div class="card-icon" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);font-size:16px">📡</div>
             <div><div class="card-title">در حال تست...</div></div>
           </div>
           <div class="prog-wrap">
@@ -916,18 +692,8 @@ example.com
         <!-- Results -->
         <div class="card hidden" id="testResultCard">
           <div class="card-head">
-            <div class="card-icon" style="background:linear-gradient(135deg,#B83A4B,#8C1515);font-size:16px">📊</div>
+            <div class="card-icon" style="background:linear-gradient(135deg,#06b6d4,#0891b2);font-size:16px">📊</div>
             <div><div class="card-title">نتایج تست</div><div class="card-sub" id="resSubtitle"></div></div>
-          </div>
-          <div class="filter-row">
-            <span style="font-size:.72rem;color:var(--text3)">فیلتر تاخیر ≤</span>
-            <input type="number" id="filterMaxMs" placeholder="همه" min="1" max="10000" oninput="filterResultsByLatency()" />
-            <span style="font-size:.72rem;color:var(--text3)">ms</span>
-            <button class="btn btn-ghost btn-sm" onclick="setLatencyFilterPreset(100)">≤100ms</button>
-            <button class="btn btn-ghost btn-sm" onclick="clearLatencyFilter()">پاک کردن فیلتر</button>
-          </div>
-          <div class="lat-chart-wrap hidden" id="latChartWrap">
-            <canvas id="latChart"></canvas>
           </div>
           <div class="res-head">
             <div class="res-sort">
@@ -958,8 +724,7 @@ example.com
           <div class="res-actions">
             <button class="btn btn-indigo btn-sm" onclick="sendSelectedToMaker()">↗ ارسال انتخابی به Config Maker</button>
             <button class="btn btn-ghost btn-sm" onclick="copySelectedIPs()">📋 کپی آی‌پی‌های انتخابی</button>
-            <button class="btn btn-ghost btn-sm" onclick="downloadResults()">⬇️ .txt</button>
-            <button class="btn btn-ghost btn-sm" onclick="downloadResultsCsv()">📊 CSV</button>
+            <button class="btn btn-ghost btn-sm" onclick="downloadResults()">⬇️ دانلود نتایج</button>
           </div>
         </div>
       </div><!-- /right -->
@@ -975,33 +740,24 @@ example.com
     <!-- Input Card -->
     <div class="card" style="margin-bottom:18px">
       <div class="card-head">
-        <div class="card-icon" style="background:linear-gradient(135deg,#651C32,#53284F)">📥</div>
+        <div class="card-icon" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed)">📥</div>
         <div>
           <div class="card-title">ورودی کانفیگ‌ها</div>
-          <div class="card-sub">VMess · VLess · Trojan · SS و subscription</div>
-        </div>
-        <div class="mode-toggle" style="margin-right:auto">
-          <button class="mode-btn active" id="extModeAddr" onclick="setExtractorMode('address')">آدرس</button>
-          <button class="mode-btn" id="extModeFull" onclick="setExtractorMode('full')">همه فیلدها</button>
+          <div class="card-sub">هر تعداد کانفیگ VMess یا VLess را اینجا paste کنید</div>
         </div>
       </div>
-      <textarea id="extractorInput" rows="12" placeholder="کانفیگ‌ها یا subscription Base64...
+      <textarea id="extractorInput" rows="12" placeholder="کانفیگ‌های خود را اینجا paste کنید... (چند خطی پشتیبانی می‌شود)
 
 مثال:
 vmess://eyJ2IjoiMiIsInBzIjoiVGVzdCIsImFkZCI6IjEuMi4zLjQiLCJwb3J0IjoiNDQzIiwiaWQiOiJ1dWlkIiwiYWlkIjoiMCIsInNjeSI6ImF1dG8iLCJuZXQiOiJ3cyIsInR5cGUiOiJub25lIiwiaG9zdCI6ImV4YW1wbGUuY29tIiwicGF0aCI6Ii93cyIsInRscyI6InRscyIsInNuaSI6ImV4YW1wbGUuY29tIn0=
 vless://uuid@5.6.7.8:443?type=ws&security=tls#Test2"></textarea>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-indigo" style="flex:1" onclick="extractAddresses()">🔍 استخراج</button>
-        <button class="btn btn-ghost" onclick="dedupExtractorByUuid()">Deduplicate UUID</button>
-        <button class="btn btn-ghost" onclick="showExtractorDiff()">Diff</button>
-        <button class="btn btn-ghost" onclick="convertVmessToVless()">VMess→VLess</button>
-      </div>
+      <button class="btn btn-indigo btn-full" onclick="extractAddresses()">🔍 &nbsp;استخراج آدرس‌ها</button>
     </div>
 
     <!-- Results Card -->
     <div class="card hidden" id="extractorResultCard">
       <div class="card-head">
-        <div class="card-icon" style="background:linear-gradient(135deg,#009B76,#007C5A)">📋</div>
+        <div class="card-icon" style="background:linear-gradient(135deg,#10b981,#059669)">📋</div>
         <div>
           <div class="card-title">آدرس‌های استخراج شده</div>
           <div class="card-sub" id="extractorCount">0 آدرس یافت شد</div>
@@ -1022,7 +778,7 @@ vless://uuid@5.6.7.8:443?type=ws&security=tls#Test2"></textarea>
 
 </div><!-- /wrap -->
 
-<footer>V2Ray Config Maker &nbsp;·&nbsp; Pipeline · QR · CSV · Subscription &nbsp;·&nbsp; VMess · VLess · Ping Tester</footer>
+<footer>V2Ray Config Maker &nbsp;·&nbsp; <a href="https://github.com/alireza-aminzadeh/cconfig-maker" target="_blank" rel="noopener noreferrer">GitHub</a> &nbsp;·&nbsp; <a href="https://alireza-aminzadeh.github.io/cconfig-maker/">Live</a> &nbsp;·&nbsp; Pure JS + CSS &nbsp;·&nbsp; VMess · VLess · WS · gRPC · HTTPUpgrade · XHTTP · Ping Tester</footer>
 
 <!-- ═══════════════════════════════════════════════ -->
 <!--  JAVASCRIPT                                    -->
@@ -1146,75 +902,14 @@ let PARSED = null;
 let GENERATED = [];
 let testResults = [];
 let testAbort = false;
-let testPaused = false;
 let editingListId = null;
-let IP_LATENCY_MAP = {};
-let extractorMode = 'address';
-let EXTRACTED_FULL = [];
-let deletedListUndo = null;
-let jsonPreviewContent = '';
-
-const SETTINGS_KEY = 'v2ray_maker_settings_v1';
-const PRESETS_KEY = 'v2ray_maker_presets_v1';
-const HISTORY_KEY = 'v2ray_maker_history_v1';
-const BLACKLIST_KEY = 'v2ray_ip_blacklist_v1';
-const DEFAULT_SETTINGS = {
-  autoExport: true, nameTemplate: '{name}-{ip}', theme: 'light', lang: 'fa',
-  keepOriginalIP: false, testMode: 'http', dnsResolve: false, filterOnlySuccess: false,
-};
-
-function loadSettings() {
-  try { return { ...DEFAULT_SETTINGS, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') }; }
-  catch { return { ...DEFAULT_SETTINGS }; }
-}
-function saveSettings() {
-  const s = {
-    autoExport: document.getElementById('autoExportToggle')?.checked ?? true,
-    nameTemplate: document.getElementById('nameTemplate')?.value.trim() || DEFAULT_SETTINGS.nameTemplate,
-    theme: document.documentElement.dataset.theme || 'light',
-    lang: document.documentElement.lang === 'en' ? 'en' : 'fa',
-    keepOriginalIP: document.getElementById('keepOriginalIPToggle')?.checked ?? false,
-    testMode: document.getElementById('testMode')?.value || 'http',
-    dnsResolve: document.getElementById('dnsResolveToggle')?.checked ?? false,
-    filterOnlySuccess: document.getElementById('filterOnlySuccessToggle')?.checked ?? false,
-  };
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
-}
-function applySettingsToUI() {
-  const s = loadSettings();
-  const tgl = document.getElementById('autoExportToggle');
-  const tpl = document.getElementById('nameTemplate');
-  const keep = document.getElementById('keepOriginalIPToggle');
-  const tmode = document.getElementById('testMode');
-  const dns = document.getElementById('dnsResolveToggle');
-  const fos = document.getElementById('filterOnlySuccessToggle');
-  if (tgl) tgl.checked = s.autoExport;
-  if (tpl && !tpl.value) tpl.value = s.nameTemplate;
-  if (keep) keep.checked = s.keepOriginalIP;
-  if (tmode) tmode.value = s.testMode || 'http';
-  if (dns) dns.checked = s.dnsResolve;
-  if (fos) fos.checked = s.filterOnlySuccess;
-  document.documentElement.dataset.theme = s.theme || 'light';
-  document.documentElement.lang = s.lang === 'en' ? 'en' : 'fa';
-  document.documentElement.dir = s.lang === 'en' ? 'ltr' : 'rtl';
-  const themeBtn = document.getElementById('themeToggle');
-  if (themeBtn) themeBtn.textContent = s.theme === 'dark' ? '☀️' : '🌙';
-  const langBtn = document.getElementById('langToggle');
-  if (langBtn) langBtn.textContent = s.lang === 'en' ? 'FA' : 'EN';
-  const bl = document.getElementById('blacklistInput');
-  if (bl) bl.value = loadBlacklist().join('\n');
-  renderPresetSelect();
-  renderHistory();
-}
 
 // ── Tab switching ──────────────────────────────────
-function switchTab(tab, btn) {
+function switchTab(tab) {
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(`tab-${tab}`).classList.remove('hidden');
-  const tabIdx = { maker: 0, ips: 1, extractor: 2 };
-  const target = btn || document.querySelectorAll('.tab-btn')[tabIdx[tab]];
-  if (target) target.classList.add('active');
+  event.currentTarget.classList.add('active');
 }
 
 // ── Accordion ──────────────────────────────────────
@@ -1291,43 +986,8 @@ function sendSelectionToMaker() {
   if (!vals.length) { toast('هیچ موردی انتخاب نشده', 'err'); return; }
   document.getElementById('ipInput').value = vals.join('\n');
   setMakerMode('manual');
-  switchTab('maker');
+  document.querySelector('.tab-btn').click();
   toast(`${vals.length} رنج/آی‌پی به Config Maker ارسال شد ✓`, 'ok');
-}
-
-function applyParsedToTest() {
-  if (!PARSED) { toast('ابتدا در Config Maker یک کانفیگ را تحلیل کنید', 'err'); return; }
-  const tls = PARSED.proto === 'vmess' ? PARSED.tls : (PARSED.security || PARSED.tls);
-  const scheme = tls && tls !== 'none' ? 'https' : 'http';
-  const port = PARSED.port ? `:${PARSED.port}` : '';
-  const path = PARSED.path ? (PARSED.path.startsWith('/') ? PARSED.path : '/' + PARSED.path) : '/';
-  document.getElementById('testUrl').value = `${scheme}://{ip}${port}${path}`;
-  const mode = document.getElementById('testMode');
-  if (mode && tls && tls !== 'none') mode.value = 'https';
-  toast('URL تست از کانفیگ اعمال شد ✓', 'ok');
-}
-
-async function testAndGenerate() {
-  if (!PARSED) {
-    toast('ابتدا در تب Config Maker کانفیگ را تحلیل کنید', 'err');
-    switchTab('maker');
-    return;
-  }
-  const n = Math.max(1, +document.getElementById('pipelineBestN').value || 10);
-  document.getElementById('testGenBtn').disabled = true;
-  try {
-    const results = await startTest();
-    const best = [...results].filter(r => r.ok && r.ms).sort((a, b) => a.ms - b.ms).slice(0, n);
-    if (!best.length) { toast('هیچ IP موفقی برای تولید یافت نشد', 'err'); return; }
-    best.forEach(r => { IP_LATENCY_MAP[r.ip] = r.ms; });
-    document.getElementById('ipInput').value = best.map(r => r.ip).join('\n');
-    setMakerMode('manual');
-    switchTab('maker');
-    generateConfigs();
-    toast(`Pipeline: ${best.length} IP برتر → ${GENERATED.length} کانفیگ`, 'ok');
-  } finally {
-    document.getElementById('testGenBtn').disabled = false;
-  }
 }
 
 // ── localStorage lists ─────────────────────────────
@@ -1359,7 +1019,6 @@ function renderMyLists() {
         </div>
       </label>
       <div class="mli-actions">
-        <button class="btn btn-ghost btn-sm" onclick="duplicateList('${list.id}')" title="کپی">📑</button>
         <button class="btn btn-ghost btn-sm" onclick="editList('${list.id}')" title="ویرایش">✏️</button>
         <button class="btn btn-ghost btn-sm" onclick="deleteList('${list.id}')" title="حذف">🗑</button>
       </div>
@@ -1411,33 +1070,11 @@ function editList(id) { openListModal(id); }
 
 function deleteList(id) {
   if (!confirm('آیا مطمئن هستید؟')) return;
-  const lists = loadLists();
-  const removed = lists.find(l => l.id === id);
-  if (removed) deletedListUndo = { list: removed, at: Date.now() };
-  saveLists(lists.filter(l => l.id !== id));
+  const lists = loadLists().filter(l => l.id !== id);
+  saveLists(lists);
   renderMyLists();
   updateSelCount();
-  toast('لیست حذف شد — Ctrl+Z برای بازگردانی', 'ok');
-}
-
-function undoDeleteList() {
-  if (!deletedListUndo) { toast('چیزی برای بازگردانی نیست', 'wrn'); return; }
-  const lists = loadLists();
-  lists.push(deletedListUndo.list);
-  saveLists(lists);
-  deletedListUndo = null;
-  renderMyLists();
-  toast('لیست بازگردانی شد ✓', 'ok');
-}
-
-function duplicateList(id) {
-  const list = loadLists().find(l => l.id === id);
-  if (!list) return;
-  const lists = loadLists();
-  lists.push({ ...list, id: crypto.randomUUID(), name: list.name + ' (copy)', created: Date.now(), modified: Date.now() });
-  saveLists(lists);
-  renderMyLists();
-  toast('لیست کپی شد ✓', 'ok');
+  toast('لیست حذف شد', 'ok');
 }
 
 // ── IP expansion ───────────────────────────────────
@@ -1521,85 +1158,14 @@ function expandIPs(text, maxPerRange = Infinity) {
   return [...new Set(result)];
 }
 
-function loadBlacklist() {
-  try { return JSON.parse(localStorage.getItem(BLACKLIST_KEY) || '[]'); }
-  catch { return []; }
-}
-function saveBlacklist() {
-  const raw = document.getElementById('blacklistInput')?.value || '';
-  const items = raw.split('\n').map(s => s.trim()).filter(Boolean);
-  localStorage.setItem(BLACKLIST_KEY, JSON.stringify(items));
-}
-function filterBlacklist(ips) {
-  const bl = new Set(loadBlacklist());
-  return ips.filter(ip => !bl.has(ip));
-}
-
-async function resolveDomainDoH(domain) {
-  try {
-    const r = await fetch(`https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=A`, {
-      headers: { Accept: 'application/dns-json' }
-    });
-    const j = await r.json();
-    return (j.Answer || []).filter(a => a.type === 1).map(a => a.data);
-  } catch { return []; }
-}
-
-async function resolveDomainsInList(ips) {
-  const out = [];
-  for (const item of ips) {
-    if (/^\d+\.\d+\.\d+\.\d+/.test(item) || item.includes(':')) { out.push(item); continue; }
-    if (/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(item)) {
-      const resolved = await resolveDomainDoH(item);
-      if (resolved.length) out.push(...resolved);
-      else out.push(item);
-    } else out.push(item);
-  }
-  return [...new Set(out)];
-}
-
-function buildTestUrl(ip, urlTpl) {
-  const p = PARSED || {};
-  const port = p.port || '443';
-  const path = p.path ? (p.path.startsWith('/') ? p.path : '/' + p.path) : '/';
-  const sni = p.sni || p.host || '';
-  return urlTpl
-    .replace(/\{ip\}/g, ip.includes(':') ? `[${ip}]` : ip)
-    .replace(/\{port\}/g, port)
-    .replace(/\{path\}/g, path)
-    .replace(/\{sni\}/g, sni);
-}
-
-function updateTestTimeEstimate() {
-  const el = document.getElementById('testTimeEst');
-  if (!el) return;
-  const vals = collectSelectedValues();
-  if (!vals.length) { el.textContent = '—'; return; }
-  const maxPer = +document.getElementById('testMaxPerRange').value || 50;
-  const conc = +document.getElementById('testConcurrency').value || 15;
-  const timeout = +document.getElementById('testTimeout').value || 4000;
-  const estIPs = expandIPs(vals.join('\n'), maxPer).length;
-  const batches = Math.ceil(estIPs / conc);
-  const sec = Math.ceil((batches * timeout) / 1000);
-  el.textContent = `≈ ${estIPs} IP · ~${sec}s`;
-}
-
 // ── Testing engine ─────────────────────────────────
 async function testSingleIP(ip, urlTpl, timeout) {
-  const mode = document.getElementById('testMode')?.value || loadSettings().testMode || 'http';
-  const url = buildTestUrl(ip, urlTpl);
+  const url = urlTpl.replace('{ip}', ip.includes(':') ? `[${ip}]` : ip);
   const ctrl = new AbortController();
   const tid  = setTimeout(() => ctrl.abort(), timeout);
   const t0   = performance.now();
   try {
-    if (mode === 'tcp') {
-      const port = (PARSED && PARSED.port) || '443';
-      const probe = `https://${ip.includes(':') ? `[${ip}]` : ip}:${port}/favicon.ico`;
-      await fetch(probe, { mode: 'no-cors', cache: 'no-cache', signal: ctrl.signal });
-    } else {
-      const fetchUrl = mode === 'https' && url.startsWith('http://') ? url.replace('http://', 'https://') : url;
-      await fetch(fetchUrl, { mode:'no-cors', cache:'no-cache', signal:ctrl.signal });
-    }
+    await fetch(url, { mode:'no-cors', cache:'no-cache', signal:ctrl.signal });
     clearTimeout(tid);
     return { ok:true, ms:Math.round(performance.now()-t0), err:null };
   } catch(e) {
@@ -1615,7 +1181,6 @@ async function runQueue(ips, opts) {
   let idx=0, done=0;
   const worker = async () => {
     while (idx < ips.length && !testAbort) {
-      while (testPaused && !testAbort) await new Promise(r => setTimeout(r, 200));
       const ip = ips[idx++];
       const result = await testSingleIP(ip, urlTpl, timeout);
       done++;
@@ -1629,33 +1194,25 @@ async function runQueue(ips, opts) {
 
 async function startTest() {
   const vals = collectSelectedValues();
-  if (!vals.length) { toast('ابتدا آی‌پی‌هایی را انتخاب کنید', 'err'); return []; }
+  if (!vals.length) { toast('ابتدا آی‌پی‌هایی را انتخاب کنید', 'err'); return; }
 
   const urlTpl      = document.getElementById('testUrl').value.trim() || 'http://{ip}/';
   const timeout     = +document.getElementById('testTimeout').value || 4000;
   const maxPerRange = +document.getElementById('testMaxPerRange').value || 50;
   const concurrency = +document.getElementById('testConcurrency').value || 15;
-  const testMode    = document.getElementById('testMode')?.value || loadSettings().testMode || 'http';
-  const dnsResolve  = document.getElementById('dnsResolveToggle')?.checked;
 
-  let allIPs = expandIPs(vals.join('\n'), maxPerRange);
-  if (dnsResolve) {
-    toast('در حال DNS resolve...', 'wrn');
-    allIPs = await resolveDomainsInList(allIPs);
-    allIPs = [...new Set(allIPs)].filter(ip => !loadBlacklist().includes(ip));
-  }
-  if (!allIPs.length) { toast('هیچ آی‌پی قابل تستی یافت نشد', 'err'); return []; }
+  // Expand all selected values
+  const allIPs = expandIPs(vals.join('\n'), maxPerRange);
+  if (!allIPs.length) { toast('هیچ آی‌پی قابل تستی یافت نشد', 'err'); return; }
 
   testAbort  = false;
-  testPaused = false;
+  testResults = [];
 
+  // UI
   document.getElementById('testProgressCard').classList.remove('hidden');
   document.getElementById('testResultCard').classList.add('hidden');
-  document.getElementById('resTableBody').innerHTML = '';
   document.getElementById('startTestBtn').disabled = true;
-  document.getElementById('testGenBtn').disabled = true;
   document.getElementById('stopTestBtn').classList.remove('hidden');
-  document.getElementById('pauseTestBtn')?.classList.remove('hidden');
   document.getElementById('ts-ok').textContent = '0';
   document.getElementById('ts-err').textContent = '0';
   document.getElementById('ts-to').textContent = '0';
@@ -1663,7 +1220,7 @@ async function startTest() {
   let okN=0, errN=0, toN=0;
 
   await runQueue(allIPs, {
-    concurrency, urlTpl, timeout, testMode,
+    concurrency, urlTpl, timeout,
     onResult({ ip, ok, ms, err }) {
       const row = { ip, ok, ms, err };
       testResults.push(row);
@@ -1673,6 +1230,7 @@ async function startTest() {
       document.getElementById('ts-ok').textContent = okN;
       document.getElementById('ts-err').textContent = errN;
       document.getElementById('ts-to').textContent  = toN;
+      // Live append to results table
       appendResultRow(row);
     },
     onProgress(done, total) {
@@ -1683,76 +1241,21 @@ async function startTest() {
     },
   });
 
+  // Done
   document.getElementById('startTestBtn').disabled = false;
-  document.getElementById('testGenBtn').disabled = false;
   document.getElementById('stopTestBtn').classList.add('hidden');
-  document.getElementById('pauseTestBtn')?.classList.add('hidden');
   const avgMs = testResults.filter(r=>r.ok&&r.ms).reduce((a,b)=>a+b.ms,0) / (okN||1);
   document.getElementById('resSubtitle').textContent =
     `${testResults.length} تست · ${okN} موفق · میانگین ${Math.round(avgMs)} ms`;
   document.getElementById('testResultCard').classList.remove('hidden');
-  renderLatencyChart();
-  if (!testAbort) toast(`تست کامل شد: ${okN} موفق از ${testResults.length} آی‌پی`, 'ok');
-  return testResults;
+  toast(`تست کامل شد: ${okN} موفق از ${testResults.length} آی‌پی`, 'ok');
 }
 
 function stopTest() {
   testAbort = true;
-  testPaused = false;
   document.getElementById('startTestBtn').disabled = false;
-  document.getElementById('testGenBtn').disabled = false;
   document.getElementById('stopTestBtn').classList.add('hidden');
-  document.getElementById('pauseTestBtn')?.classList.add('hidden');
   toast('تست متوقف شد', 'wrn');
-}
-
-function togglePauseTest() {
-  testPaused = !testPaused;
-  const btn = document.getElementById('pauseTestBtn');
-  if (btn) btn.textContent = testPaused ? '▶ ادامه' : '⏸ مکث';
-  toast(testPaused ? 'مکث' : 'ادامه', 'wrn');
-}
-
-async function retryFailedTests() {
-  const failed = testResults.filter(r => !r.ok).map(r => r.ip);
-  if (!failed.length) { toast('IP ناموفقی برای retry نیست', 'wrn'); return; }
-  const urlTpl = document.getElementById('testUrl').value.trim() || 'http://{ip}/';
-  const timeout = +document.getElementById('testTimeout').value || 4000;
-  const testMode = document.getElementById('testMode')?.value || 'http';
-  toast(`Retry ${failed.length} IP...`, 'wrn');
-  for (const ip of failed) {
-    const result = await testSingleIP(ip, urlTpl, timeout, testMode);
-    const idx = testResults.findIndex(r => r.ip === ip);
-    if (idx >= 0) testResults[idx] = { ip, ...result };
-    if (result.ok && result.ms) IP_LATENCY_MAP[ip] = result.ms;
-  }
-  document.getElementById('resTableBody').innerHTML = '';
-  testResults.forEach(row => appendResultRow(row));
-  renderLatencyChart();
-  toast('Retry کامل شد', 'ok');
-}
-
-function setLatencyFilterPreset(ms) {
-  document.getElementById('filterMaxMs').value = ms;
-  filterResultsByLatency();
-}
-
-function filterResultsByLatency() {
-  const max = +document.getElementById('filterMaxMs').value;
-  const onlyOk = document.getElementById('filterOnlySuccessToggle')?.checked;
-  document.querySelectorAll('#resTableBody tr').forEach(tr => {
-    const ms = +tr.dataset.ms;
-    const ok = tr.dataset.ok === '1';
-    let hide = false;
-    if (onlyOk && !ok) hide = true;
-    if (max && (!ok || ms > max)) hide = true;
-    tr.classList.toggle('hidden', hide);
-  });
-}
-
-function clearLatencyFilter() {
-  document.getElementById('filterMaxMs').value = '';
-  filterResultsByLatency();
 }
 
 function appendResultRow(row) {
@@ -1820,7 +1323,7 @@ function sendSelectedToMaker() {
   if (!ips.length) { toast('هیچ آی‌پی انتخابی وجود ندارد', 'err'); return; }
   document.getElementById('ipInput').value = ips.join('\n');
   setMakerMode('manual');
-  switchTab('maker');
+  document.querySelectorAll('.tab-btn')[0].click();
   toast(`${ips.length} آی‌پی به Config Maker ارسال شد ✓`, 'ok');
 }
 
@@ -1832,27 +1335,13 @@ function copySelectedIPs() {
 
 function downloadResults() {
   if (!testResults.length) { toast('نتیجه‌ای برای دانلود وجود ندارد', 'err'); return; }
-  const lines = testResults.map(r => `${r.ip}\t${r.ok ? r.ms + 'ms' : r.err}`);
-  downloadBlob(lines.join('\n'), 'ip-test-results.txt', 'text/plain');
-  toast('فایل نتایج دانلود شد', 'ok');
-}
-
-function downloadResultsCsv() {
-  if (!testResults.length) { toast('نتیجه‌ای برای دانلود وجود ندارد', 'err'); return; }
-  const lines = ['ip,latency_ms,status,error', ...testResults.map(r =>
-    `${r.ip},${r.ok ? r.ms : ''},${r.ok ? 'ok' : r.err},${r.ok ? '' : r.err}`
-  )];
-  downloadBlob(lines.join('\n'), 'ip-test-results.csv', 'text/csv');
-  toast('فایل CSV دانلود شد', 'ok');
-}
-
-function downloadBlob(content, filename, type) {
-  const blob = new Blob([content], { type });
-  const a = Object.assign(document.createElement('a'), {
-    href: URL.createObjectURL(blob), download: filename
+  const lines = testResults.map(r => `${r.ip}\t${r.ok?r.ms+'ms':r.err}`);
+  const blob  = new Blob([lines.join('\n')], { type:'text/plain' });
+  const a     = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(blob), download: 'ip-test-results.txt'
   });
-  a.click();
-  URL.revokeObjectURL(a.href);
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('فایل نتایج دانلود شد', 'ok');
 }
 
 // ─── MAKER MODE & RANGE SELECTOR ──────────────────
@@ -2018,7 +1507,6 @@ function parseConfig() {
     if (!config) { toast('فرمت ناشناخته — باید vmess:// یا vless:// باشد','err'); return; }
     PARSED = config;
     renderParsed(config);
-    fillEditorFromParsed(config);
     setStep(2);
     toast('کانفیگ با موفقیت تحلیل شد ✓','ok');
     document.getElementById('parsedCard').scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -2071,60 +1559,6 @@ function parseVLess(uri) {
 
 const NET_LABELS = { tcp:'TCP',ws:'WebSocket',grpc:'gRPC',h2:'HTTP/2',quic:'QUIC',httpupgrade:'HTTP Upgrade',xhttp:'XHTTP',kcp:'mKCP' };
 
-function fillEditorFromParsed(cfg) {
-  const card = document.getElementById('editorCard');
-  if (!card) return;
-  document.getElementById('editName').value = cfg.name || '';
-  document.getElementById('editPort').value = cfg.port || '';
-  document.getElementById('editHost').value = cfg.host || '';
-  document.getElementById('editPath').value = cfg.path || '';
-  document.getElementById('editSni').value = cfg.sni || '';
-  const flowEl = document.getElementById('editFlow');
-  if (flowEl) flowEl.value = cfg.flow || '';
-  const s = loadSettings();
-  document.getElementById('nameTemplate').value = s.nameTemplate;
-  card.classList.remove('hidden');
-}
-
-function applyEditorToParsed() {
-  if (!PARSED) return;
-  const name = document.getElementById('editName').value.trim();
-  const port = document.getElementById('editPort').value.trim();
-  const host = document.getElementById('editHost').value.trim();
-  const path = document.getElementById('editPath').value.trim();
-  const sni  = document.getElementById('editSni').value.trim();
-  const flow = document.getElementById('editFlow')?.value.trim();
-  if (name) PARSED.name = name;
-  if (port) PARSED.port = port;
-  if (host) PARSED.host = host;
-  if (path) PARSED.path = path;
-  if (sni)  PARSED.sni = sni;
-  if (flow && PARSED.proto === 'vless') {
-    PARSED.flow = flow;
-    const p = new URLSearchParams(PARSED.rawQS || '');
-    p.set('flow', flow);
-    PARSED.rawQS = p.toString();
-  }
-  if (PARSED.proto === 'vmess' && PARSED.raw) {
-    if (name) PARSED.raw.ps = name;
-    if (port) PARSED.raw.port = port;
-    if (host) PARSED.raw.host = host;
-    if (path) PARSED.raw.path = path;
-    if (sni)  PARSED.raw.sni = sni;
-  }
-  saveSettings();
-}
-
-function formatConfigName(template, ip, index) {
-  const t = template || loadSettings().nameTemplate || '{name}-{ip}';
-  return t
-    .replace(/\{name\}/g, PARSED?.name || 'config')
-    .replace(/\{ip\}/g, ip)
-    .replace(/\{index\}/g, String(index))
-    .replace(/\{port\}/g, PARSED?.port || '')
-    .replace(/\{latency\}/g, IP_LATENCY_MAP[ip] != null ? String(IP_LATENCY_MAP[ip]) : '');
-}
-
 function renderParsed(cfg) {
   const card = document.getElementById('parsedCard');
   const body = document.getElementById('parsedBody');
@@ -2166,7 +1600,6 @@ function buildFields(cfg) {
 
 function generateConfigs() {
   if (!PARSED) { toast('ابتدا یک کانفیگ را تحلیل کنید','err'); return; }
-  applyEditorToParsed();
 
   let ips = [];
 
@@ -2196,13 +1629,13 @@ function generateConfigs() {
     if (ips.length > 5000) { toast(`${ips.length} آی‌پی — فقط ۵۰۰۰ اول استفاده می‌شود`,'wrn'); ips.splice(5000); }
   }
 
-  GENERATED = ips.map((ip, i) => ({ i: i+1, ip, cfg: makeConfig(PARSED, ip, i + 1) }));
+  GENERATED = ips.map((ip, i) => ({ i: i+1, ip, cfg: makeConfig(PARSED, ip) }));
   renderGenerated();
   setStep(3);
   const modeLabel = makerMode === 'range' ? ' (رندوم از رنج‌های انتخابی)' : '';
   toast(`${GENERATED.length} کانفیگ تولید شد ✓${modeLabel}`, 'ok');
   document.getElementById('genCard').scrollIntoView({ behavior:'smooth', block:'start' });
-  if (loadSettings().autoExport) autoExportConfigs();
+  autoExportConfigs();
 }
 
 function autoExportTimestamp() {
@@ -2239,18 +1672,16 @@ function autoExportConfigs() {
   toast(`📥 فایل ${ts}.txt ذخیره شد`, 'ok');
 }
 
-function makeVMess(cfg, ip, index) {
-  const name = formatConfigName(document.getElementById('nameTemplate')?.value, ip, index);
-  const j = { ...cfg.raw, add: ip, ps: name || cfg.raw.ps };
+function makeVMess(cfg,ip) {
+  const j={...cfg.raw,add:ip};
   return `vmess://${btoa(unescape(encodeURIComponent(JSON.stringify(j))))}`;
 }
-function makeVLess(cfg, ip, index) {
-  const host = ip.includes(':') ? `[${ip}]` : ip;
-  const name = formatConfigName(document.getElementById('nameTemplate')?.value, ip, index);
-  const frag = name ? `#${encodeURIComponent(name)}` : (cfg.name ? `#${encodeURIComponent(cfg.name)}` : '');
+function makeVLess(cfg,ip) {
+  const host=ip.includes(':')?`[${ip}]`:ip;
+  const frag=cfg.name?`#${encodeURIComponent(cfg.name)}`:'';
   return `vless://${cfg.uuid}@${host}:${cfg.port}?${cfg.rawQS}${frag}`;
 }
-function makeConfig(cfg, ip, index) { return cfg.proto === 'vmess' ? makeVMess(cfg, ip, index) : makeVLess(cfg, ip, index); }
+function makeConfig(cfg,ip) { return cfg.proto==='vmess'?makeVMess(cfg,ip):makeVLess(cfg,ip); }
 
 function renderGenerated() {
   const card=document.getElementById('genCard'),list=document.getElementById('genList');
@@ -2269,7 +1700,6 @@ function renderGenerated() {
       <div class="gen-ip">${escH(ip)}</div>
       <div class="gen-cfg">${escH(cfg)}</div>
       <button class="btn btn-ghost btn-sm" onclick="copyText('${escAttr(cfg)}')" title="کپی">📋</button>
-      <button class="btn btn-ghost btn-sm" onclick="showQrModal(${i - 1})" title="QR">📱</button>
     </div>`).join('');
   card.classList.remove('hidden');
 }
@@ -2288,47 +1718,10 @@ function copyAll() {
 }
 function downloadAll() {
   if(!GENERATED.length){toast('چیزی برای دانلود وجود ندارد','err');return;}
-  downloadBlob(GENERATED.map(g=>g.cfg).join('\n'), 'v2ray-configs.txt', 'text/plain');
+  const blob=new Blob([GENERATED.map(g=>g.cfg).join('\n')],{type:'text/plain'});
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:'v2ray-configs.txt'});
+  a.click(); URL.revokeObjectURL(a.href);
   toast('فایل دانلود شد','ok');
-}
-
-function downloadCsv() {
-  if (!GENERATED.length) { toast('چیزی برای دانلود وجود ندارد', 'err'); return; }
-  const lines = ['index,ip,config', ...GENERATED.map(g =>
-    `${g.i},"${g.ip}","${g.cfg.replace(/"/g, '""')}"`
-  )];
-  downloadBlob(lines.join('\n'), 'v2ray-configs.csv', 'text/csv');
-  toast('فایل CSV دانلود شد', 'ok');
-}
-
-function exportSubscription() {
-  if (!GENERATED.length) { toast('چیزی برای export وجود ندارد', 'err'); return; }
-  const body = GENERATED.map(g => g.cfg).join('\n');
-  const b64 = btoa(unescape(encodeURIComponent(body)));
-  downloadBlob(b64, 'subscription.txt', 'text/plain');
-  copyText(b64);
-  toast('Subscription (Base64) دانلود و کپی شد', 'ok');
-}
-
-function showQrModal(index) {
-  if (!GENERATED.length) { toast('ابتدا کانفیگ تولید کنید', 'err'); return; }
-  const item = GENERATED[index] || GENERATED[0];
-  const modal = document.getElementById('qrModal');
-  const canvas = document.getElementById('qrCanvas');
-  const textEl = document.getElementById('qrConfigText');
-  textEl.textContent = item.cfg;
-  modal.classList.remove('hidden');
-  if (typeof QRCode === 'undefined') {
-    toast('کتابخانه QR هنوز لود نشده — چند ثانیه صبر کنید', 'wrn');
-    return;
-  }
-  QRCode.toCanvas(canvas, item.cfg, { width: 256, margin: 2 }, err => {
-    if (err) toast('خطا در ساخت QR', 'err');
-  });
-}
-
-function closeQrModal() {
-  document.getElementById('qrModal').classList.add('hidden');
 }
 
 function copyText(text) {
@@ -2356,7 +1749,6 @@ function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
 function escAttr(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;')}
 
 // ── Init ───────────────────────────────────────────
-applySettingsToUI();
 renderCFGroups();
 renderMyLists(); // also calls renderMakerRanges() internally
 
@@ -2482,11 +1874,10 @@ function sendAddressesToMaker() {
   
   document.getElementById('ipInput').value = EXTRACTED_ADDRESSES.join('\n');
   setMakerMode('manual');
-  switchTab('maker');
+  document.querySelectorAll('.tab-btn')[0].click();
   toast(`${EXTRACTED_ADDRESSES.length} آدرس به Config Maker ارسال شد ✓`, 'ok');
 }
 
 </script>
-<script src="index2-features.js"></script>
 </body>
 </html>
