@@ -3,13 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#030712" />
+  <link rel="manifest" href="manifest.json" />
   <title>V2Ray Config Maker</title>
-  <link rel="canonical" href="https://alireza-aminzadeh.github.io/cconfig-maker/" />
-  <meta property="og:url" content="https://alireza-aminzadeh.github.io/cconfig-maker/" />
-  <meta property="og:title" content="V2Ray Config Maker" />
+  <script>
+    // Apply saved theme before first paint to avoid a flash of the wrong theme.
+    (function () {
+      try {
+        var saved = localStorage.getItem('v2ray_theme_v1');
+        var theme = saved || ((window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
   <style>
     /* ── Variables ─────────────────────────────── */
-    :root {
+    /* Dark theme (default) */
+    :root, html[data-theme="dark"] {
       --bg: #030712;
       --surface: rgba(15, 23, 42, 0.85);
       --surface2: rgba(10, 16, 32, 0.9);
@@ -21,17 +33,52 @@
       --rose: #f43f5e; --orange: #f97316;
       --text: #f1f5f9; --text2: #94a3b8; --text3: #475569;
       --mono: 'Courier New','Consolas',monospace;
+
+      /* semantic surfaces (theme-aware) */
+      --panel-bg: rgba(0,0,0,.3);        /* recessed panels: field-box, gen-item, stat/ts-box, my-list-item */
+      --panel-bg-soft: rgba(0,0,0,.2);   /* accordion container */
+      --panel-bg-strong: rgba(0,0,0,.4); /* inputs, textareas, progress track, mode-toggle */
+      --ghost-bg: rgba(255,255,255,.06);
+      --ghost-bg-hover: rgba(255,255,255,.11);
+      --ghost-border: rgba(255,255,255,.1);
+      --overlay-backdrop: rgba(0,0,0,.7);
+      --shadow-color: rgba(0,0,0,.3);
+      --shadow-color-strong: rgba(0,0,0,.55);
+      --float-bg: rgba(13,18,41,.97);    /* modal / toast surfaces */
+      --blob-opacity: .16;
+    }
+    /* Light theme */
+    html[data-theme="light"] {
+      --bg: #eef1f7;
+      --surface: rgba(255, 255, 255, 0.82);
+      --surface2: rgba(255, 255, 255, 0.94);
+      --border: rgba(99, 102, 241, 0.22);
+      --border-h: rgba(99, 102, 241, 0.5);
+      --text: #0f172a; --text2: #334155; --text3: #64748b;
+
+      --panel-bg: rgba(15,23,42,.045);
+      --panel-bg-soft: rgba(15,23,42,.03);
+      --panel-bg-strong: rgba(15,23,42,.07);
+      --ghost-bg: rgba(15,23,42,.05);
+      --ghost-bg-hover: rgba(15,23,42,.09);
+      --ghost-border: rgba(15,23,42,.12);
+      --overlay-backdrop: rgba(15,23,42,.45);
+      --shadow-color: rgba(15,23,42,.1);
+      --shadow-color-strong: rgba(15,23,42,.2);
+      --float-bg: rgba(255,255,255,.98);
+      --blob-opacity: .1;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
       background: var(--bg); color: var(--text);
       min-height: 100vh; overflow-x: hidden;
+      transition: background-color .3s ease, color .3s ease;
     }
 
     /* ── Blobs ──────────────────────────────────── */
     .blobs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-    .blobs span { position: absolute; border-radius: 50%; filter: blur(80px); opacity: .16; animation: drift 18s ease-in-out infinite alternate; }
+    .blobs span { position: absolute; border-radius: 50%; filter: blur(80px); opacity: var(--blob-opacity); transition: opacity .3s ease; animation: drift 18s ease-in-out infinite alternate; }
     .blobs span:nth-child(1) { width:500px;height:500px;background:var(--indigo);top:-100px;left:-150px;animation-duration:20s }
     .blobs span:nth-child(2) { width:400px;height:400px;background:var(--violet);top:40%;right:-100px;animation-duration:15s;animation-delay:-5s }
     .blobs span:nth-child(3) { width:350px;height:350px;background:var(--cyan);bottom:-100px;left:30%;animation-duration:22s;animation-delay:-8s }
@@ -43,6 +90,21 @@
 
     /* ── Layout ─────────────────────────────────── */
     .wrap { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 0 20px 60px; }
+
+    /* ── Theme Toggle ───────────────────────────── */
+    .theme-toggle {
+      position: fixed; top: 18px; left: 18px; z-index: 60;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--surface); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 19px; line-height: 1; cursor: pointer;
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 4px 16px var(--shadow-color);
+      transition: transform .25s, border-color .25s, box-shadow .25s, background-color .3s;
+    }
+    .theme-toggle:hover { transform: translateY(-2px) rotate(12deg); border-color: var(--border-h); }
+    .theme-toggle:active { transform: scale(.92); }
+    @media(max-width:600px){ .theme-toggle{ width:38px;height:38px;font-size:16px;top:12px;left:12px } }
 
     /* ── Header ─────────────────────────────────── */
     header { text-align: center; padding: 40px 20px 24px; }
@@ -76,12 +138,13 @@
     /* ── Tab Nav ────────────────────────────────── */
     .tab-nav {
       display: flex; gap: 4px;
-      background: rgba(0,0,0,.3);
+      background: var(--panel-bg);
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 6px;
       margin: 24px 0 20px;
       backdrop-filter: blur(12px);
+      transition: background-color .3s ease;
     }
     .tab-btn {
       flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -103,8 +166,8 @@
       border: 1px solid var(--border);
       border-radius: 20px; padding: 22px;
       backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-      box-shadow: 0 8px 32px rgba(0,0,0,.3);
-      transition: border-color .3s, box-shadow .3s;
+      box-shadow: 0 8px 32px var(--shadow-color);
+      transition: border-color .3s, box-shadow .3s, background-color .3s;
     }
     .card:hover { border-color: var(--border-h); box-shadow: 0 12px 48px rgba(99,102,241,.1); }
     .card-head { display:flex;align-items:center;gap:10px;margin-bottom:16px; }
@@ -120,11 +183,11 @@
 
     /* ── Inputs ─────────────────────────────────── */
     textarea, input[type=text], input[type=number] {
-      width:100%; background:rgba(0,0,0,.4);
+      width:100%; background:var(--panel-bg-strong);
       border:1px solid rgba(99,102,241,.2); border-radius:11px;
       color:var(--text); padding:12px 14px;
       font-family:var(--mono); font-size:.82rem; line-height:1.6;
-      outline:none; transition:border-color .25s,box-shadow .25s;
+      outline:none; transition:border-color .25s,box-shadow .25s,background-color .3s,color .3s;
     }
     textarea { resize:vertical; direction:ltr; text-align:left; }
     input[type=text],input[type=number] { direction:ltr; text-align:left; }
@@ -142,6 +205,7 @@
       transition:transform .2s,box-shadow .2s;font-family:inherit;white-space:nowrap;
     }
     .btn:active{transform:scale(.97)!important}
+    .btn:disabled{opacity:.55;cursor:not-allowed;pointer-events:none;transform:none!important}
     .btn-indigo{background:linear-gradient(135deg,var(--indigo),var(--indigo-d));color:#fff;box-shadow:0 4px 20px rgba(99,102,241,.4);}
     .btn-indigo:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(99,102,241,.55)}
     .btn-emerald{background:linear-gradient(135deg,var(--emerald),#059669);color:#fff;box-shadow:0 4px 20px rgba(16,185,129,.4);}
@@ -150,17 +214,17 @@
     .btn-violet:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(139,92,246,.55)}
     .btn-rose{background:linear-gradient(135deg,var(--rose),#be123c);color:#fff;box-shadow:0 4px 16px rgba(244,63,94,.35);}
     .btn-rose:hover{transform:translateY(-2px)}
-    .btn-ghost{background:rgba(255,255,255,.06);color:var(--text2);border:1px solid rgba(255,255,255,.1);}
-    .btn-ghost:hover{background:rgba(255,255,255,.11);color:var(--text)}
+    .btn-ghost{background:var(--ghost-bg);color:var(--text2);border:1px solid var(--ghost-border);}
+    .btn-ghost:hover{background:var(--ghost-bg-hover);color:var(--text)}
     .btn-sm{padding:6px 13px;font-size:.76rem;border-radius:8px}
     .btn-full{width:100%;margin-top:12px}
 
     /* ── Config fields (tab1) ────────────────────── */
     .fields-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:9px; }
     .field-box {
-      background:rgba(0,0,0,.3);border:1px solid rgba(99,102,241,.12);
+      background:var(--panel-bg);border:1px solid rgba(99,102,241,.12);
       border-radius:11px;padding:10px 13px;cursor:pointer;
-      transition:border-color .2s,background .2s;overflow:hidden;
+      transition:border-color .2s,background .2s,background-color .3s;overflow:hidden;
     }
     .field-box:hover{border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.07)}
     .field-lbl{font-size:.66rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:4px;font-weight:600}
@@ -177,7 +241,7 @@
     .bm{color:var(--text2);border-color:rgba(148,163,184,.2);background:rgba(148,163,184,.05)}
     .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
     @media(max-width:640px){.stats-row{grid-template-columns:repeat(2,1fr)}}
-    .stat-box{background:rgba(0,0,0,.25);border:1px solid rgba(99,102,241,.12);border-radius:13px;padding:13px;text-align:center}
+    .stat-box{background:var(--panel-bg);border:1px solid rgba(99,102,241,.12);border-radius:13px;padding:13px;text-align:center}
     .stat-val{font-size:1.5rem;font-weight:800;background:linear-gradient(135deg,var(--indigo),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2}
     .stat-lbl{font-size:.7rem;color:var(--text3);margin-top:3px}
     .gen-actions{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:wrap}
@@ -185,7 +249,7 @@
     .gen-list{display:flex;flex-direction:column;gap:6px;max-height:500px;overflow-y:auto;padding-right:3px}
     .gen-list::-webkit-scrollbar{width:3px}
     .gen-list::-webkit-scrollbar-thumb{background:rgba(99,102,241,.4);border-radius:3px}
-    .gen-item{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.3);border:1px solid rgba(99,102,241,.12);border-radius:10px;padding:9px 12px;animation:slide-in .25s ease both;transition:border-color .2s}
+    .gen-item{display:flex;align-items:center;gap:8px;background:var(--panel-bg);border:1px solid rgba(99,102,241,.12);border-radius:10px;padding:9px 12px;animation:slide-in .25s ease both;transition:border-color .2s,background-color .3s}
     .gen-item:hover{border-color:rgba(99,102,241,.35)}
     @keyframes slide-in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
     .gen-num{font-size:.7rem;color:var(--text3);min-width:22px;text-align:center;font-weight:700;direction:ltr}
@@ -193,7 +257,7 @@
     .gen-cfg{flex:1;font-family:var(--mono);font-size:.7rem;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr}
 
     /* ── Accordion ───────────────────────────────── */
-    .accrd { border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:10px;background:rgba(0,0,0,.2); }
+    .accrd { border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:10px;background:var(--panel-bg-soft); }
     .accrd-head {
       display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;
       background:rgba(99,102,241,.05);transition:background .2s;user-select:none;
@@ -242,11 +306,11 @@
 
     /* ── Progress ────────────────────────────────── */
     .prog-wrap{margin:14px 0}
-    .prog-bar-bg{height:8px;background:rgba(0,0,0,.4);border-radius:4px;overflow:hidden;margin:6px 0}
+    .prog-bar-bg{height:8px;background:var(--panel-bg-strong);border-radius:4px;overflow:hidden;margin:6px 0}
     .prog-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--indigo),var(--cyan));transition:width .3s ease;width:0}
     .prog-info{display:flex;justify-content:space-between;font-size:.75rem;color:var(--text3)}
     .test-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
-    .ts-box{background:rgba(0,0,0,.25);border-radius:10px;padding:10px;text-align:center}
+    .ts-box{background:var(--panel-bg);border-radius:10px;padding:10px;text-align:center}
     .ts-val{font-size:1.3rem;font-weight:800;line-height:1.1}
     .ts-lbl{font-size:.65rem;color:var(--text3);margin-top:2px}
     .tv-ok{color:var(--emerald)} .tv-err{color:var(--rose)} .tv-to{color:var(--amber)}
@@ -283,8 +347,8 @@
     /* ── User list management ────────────────────── */
     .my-list-item{
       display:flex;align-items:center;justify-content:space-between;gap:8px;
-      background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:11px;
-      padding:10px 14px;cursor:pointer;transition:border-color .2s,background .2s;
+      background:var(--panel-bg);border:1px solid var(--border);border-radius:11px;
+      padding:10px 14px;cursor:pointer;transition:border-color .2s,background .2s,background-color .3s;
     }
     .my-list-item:hover{border-color:var(--border-h);background:rgba(99,102,241,.07)}
     .my-list-item.selected{border-color:rgba(6,182,212,.5);background:rgba(6,182,212,.07)}
@@ -295,27 +359,68 @@
     /* ── Add list modal ─────────────────────────── */
     .modal-overlay{
       position:fixed;inset:0;z-index:500;
-      background:rgba(0,0,0,.7);backdrop-filter:blur(6px);
+      background:var(--overlay-backdrop);backdrop-filter:blur(6px);
       display:flex;align-items:center;justify-content:center;padding:20px;
     }
     .modal-overlay.hidden{display:none!important}
     .modal{
-      background:rgba(13,18,41,.97);border:1px solid var(--border-h);
+      background:var(--float-bg);border:1px solid var(--border-h);
       border-radius:20px;padding:28px;width:100%;max-width:500px;
-      box-shadow:0 20px 60px rgba(0,0,0,.6);
+      box-shadow:0 20px 60px var(--shadow-color-strong);
     }
     .modal-title{font-size:1.1rem;font-weight:700;margin-bottom:18px;color:var(--text)}
     .modal-row{margin-bottom:14px}
     .modal-row label{display:block;font-size:.78rem;color:var(--text2);margin-bottom:6px;font-weight:600}
     .modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
 
+    /* ── QR Code modal ───────────────────────────── */
+    .qr-modal{max-width:400px;text-align:center;position:relative}
+    .qr-modal-close{
+      position:absolute;top:14px;left:14px;width:30px;height:30px;border-radius:50%;
+      border:1px solid var(--ghost-border);background:var(--ghost-bg);color:var(--text2);
+      font-size:.85rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;
+      transition:background .2s,color .2s;
+    }
+    .qr-modal-close:hover{background:var(--ghost-bg-hover);color:var(--text)}
+    .qr-modal-sub{font-size:.78rem;color:var(--text2);margin-bottom:2px;word-break:break-all;direction:ltr}
+    .qr-modal-num{font-size:.72rem;color:var(--text3);margin-bottom:14px}
+    .qr-stage{display:flex;justify-content:center;margin:6px 0 14px;cursor:zoom-in}
+    .qr-box{
+      background:#fff;border-radius:16px;padding:16px;
+      width:min(70vw,270px);aspect-ratio:1/1;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 8px 30px var(--shadow-color-strong);
+      transition:width .25s ease,height .25s ease;
+    }
+    .qr-box svg{width:100%;height:100%;display:block}
+    .qr-box.qr-error{background:var(--panel-bg-strong);flex-direction:column;gap:10px;padding:22px;box-shadow:none}
+    .qr-error-icon{font-size:2rem}
+    .qr-error-text{font-size:.76rem;color:var(--text2);line-height:1.8}
+    .qr-error-text b{color:var(--amber)}
+    .qr-hint{font-size:.7rem;color:var(--text3);line-height:1.6;margin-bottom:14px}
+    .qr-text-box{
+      font-family:var(--mono);font-size:.7rem;color:var(--text2);background:var(--panel-bg);
+      border:1px solid rgba(99,102,241,.12);border-radius:10px;padding:9px 12px;
+      max-height:74px;overflow-y:auto;word-break:break-all;direction:ltr;text-align:left;
+      cursor:pointer;margin-bottom:4px;transition:border-color .2s;
+    }
+    .qr-text-box:hover{border-color:rgba(99,102,241,.35)}
+    .qr-modal-actions{justify-content:center;flex-wrap:wrap}
+    .qr-modal:fullscreen,.qr-modal:-webkit-full-screen{
+      max-width:100vw;width:100vw;height:100vh;max-height:100vh;border-radius:0;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:24px;box-sizing:border-box;
+    }
+    .qr-modal:fullscreen .qr-box,.qr-modal:-webkit-full-screen .qr-box{width:min(80vw,80vh)}
+    .qr-modal:fullscreen .qr-text-box,.qr-modal:-webkit-full-screen .qr-text-box{display:none}
+
     /* ── Toast ──────────────────────────────────── */
     #toasts{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:7px;pointer-events:none}
     .toast{
       display:flex;align-items:center;gap:9px;padding:11px 18px;border-radius:12px;
-      background:rgba(13,18,41,.97);border:1px solid rgba(99,102,241,.3);
+      background:var(--float-bg);border:1px solid rgba(99,102,241,.3);
       color:var(--text);font-size:.86rem;font-weight:500;backdrop-filter:blur(20px);
-      box-shadow:0 8px 32px rgba(0,0,0,.4);animation:toast-in .28s ease;
+      box-shadow:0 8px 32px var(--shadow-color);animation:toast-in .28s ease;
       pointer-events:all;min-width:220px;max-width:360px;
     }
     .toast.ok{border-color:rgba(16,185,129,.5)}.toast.err{border-color:rgba(244,63,94,.5)}.toast.wrn{border-color:rgba(245,158,11,.5)}
@@ -327,19 +432,26 @@
     .empty-icon{font-size:2.8rem;margin-bottom:10px;opacity:.45;display:block}
 
     footer{text-align:center;padding:22px;color:var(--text3);font-size:.78rem}
-    footer a{color:var(--cyan);text-decoration:none}
-    footer a:hover{text-decoration:underline}
-    .hdr-tools{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
-    .hdr-tools a{padding:6px 14px;font-size:.76rem}
     .hidden{display:none!important}
     .mt10{margin-top:10px} .mt14{margin-top:14px}
     .divider{height:1px;background:rgba(99,102,241,.15);margin:14px 0}
 
     /* ── Maker Mode Toggle ───────────────────────── */
-    .mode-toggle{display:flex;gap:3px;background:rgba(0,0,0,.35);border-radius:10px;padding:3px;flex-shrink:0}
+    .mode-toggle{display:flex;gap:3px;background:var(--panel-bg-strong);border-radius:10px;padding:3px;flex-shrink:0}
     .mode-btn{padding:5px 12px;border-radius:7px;border:none;font-size:.73rem;font-weight:600;cursor:pointer;font-family:inherit;color:var(--text2);background:transparent;transition:all .2s;white-space:nowrap}
     .mode-btn.active{background:var(--indigo);color:#fff;box-shadow:0 2px 8px rgba(99,102,241,.4)}
     .mode-btn:hover:not(.active){color:var(--text);background:rgba(99,102,241,.15)}
+
+    /* ── Config Naming Options ───────────────────── */
+    .naming-section{margin:16px 0 4px}
+    .naming-modes{display:flex;flex-direction:column;gap:2px;margin-top:8px}
+    .radio-row{display:flex;align-items:center;gap:8px;padding:6px 7px;border-radius:8px;cursor:pointer;transition:background .15s;font-size:.8rem;color:var(--text2)}
+    .radio-row:hover{background:rgba(99,102,241,.1);color:var(--text)}
+    .radio-row input[type=radio]{width:15px;height:15px;accent-color:var(--indigo);cursor:pointer;flex-shrink:0}
+    .naming-fields{display:grid;grid-template-columns:1fr 90px;gap:10px;margin-top:10px}
+    @media(max-width:480px){.naming-fields{grid-template-columns:1fr}}
+    .gen-name{font-family:var(--mono);font-size:.72rem;color:#818cf8;min-width:0;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr;text-align:left}
+    @media(max-width:640px){.gen-name{display:none}}
 
     /* ── Maker Range Selector ────────────────────── */
     .maker-ranges-scroll{max-height:300px;overflow-y:auto;padding-right:3px;margin-bottom:10px}
@@ -365,6 +477,10 @@
 
 <div class="blobs"><span></span><span></span><span></span></div>
 <div id="toasts"></div>
+
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="تغییر حالت روز/شب" aria-label="تغییر حالت روز/شب">
+  <span id="themeIcon">🌙</span>
+</button>
 
 <!-- ── Add List Modal ────────────────────────────── -->
 <div class="modal-overlay hidden" id="listModal">
@@ -392,6 +508,30 @@ example.com"></textarea>
   </div>
 </div>
 
+<!-- ── QR Code Modal ─────────────────────────────── -->
+<div class="modal-overlay hidden" id="qrModal" onclick="if(event.target===this)closeQrModal()">
+  <div class="modal qr-modal" id="qrModalBox">
+    <button class="qr-modal-close" onclick="closeQrModal()" title="بستن" aria-label="بستن">✕</button>
+    <div class="modal-title">🔳 اسکن کانفیگ</div>
+    <div class="qr-modal-sub" id="qrModalLabel"></div>
+    <div class="qr-modal-num" id="qrModalNum"></div>
+
+    <div class="qr-stage" id="qrStage" onclick="toggleQrFullscreen()" title="برای تمام‌صفحه کلیک کنید">
+      <div class="qr-box" id="qrCodeBox"></div>
+    </div>
+
+    <div class="qr-hint">📷 صفحه را با اپ V2Ray یا دوربین گوشی اسکن کنید — برای اسکن راحت‌تر از فاصله دور روی «تمام‌صفحه» بزنید.</div>
+
+    <div class="qr-text-box" id="qrModalText" onclick="copyText(this.textContent)" title="کپی متن کانفیگ"></div>
+
+    <div class="modal-actions qr-modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="toggleQrFullscreen()" id="qrFullscreenBtn">⛶ تمام‌صفحه</button>
+      <button class="btn btn-ghost btn-sm" onclick="copyText(document.getElementById('qrModalText').textContent)">📋 کپی کانفیگ</button>
+      <button class="btn btn-indigo btn-sm" onclick="closeQrModal()">بستن</button>
+    </div>
+  </div>
+</div>
+
 <div class="wrap">
 
   <!-- ── Header ─────────────────────────────────── -->
@@ -399,10 +539,6 @@ example.com"></textarea>
     <div class="logo-ring">⚡</div>
     <h1>V2Ray Config Maker</h1>
     <p class="subtitle">استخراج · تحلیل · تولید کانفیگ · مدیریت IP · تست تاخیر</p>
-    <div class="hdr-tools">
-      <a class="btn btn-ghost btn-sm" href="https://github.com/alireza-aminzadeh/cconfig-maker" target="_blank" rel="noopener noreferrer">GitHub</a>
-      <a class="btn btn-ghost btn-sm" href="https://alireza-aminzadeh.github.io/cconfig-maker/">Live</a>
-    </div>
     <div class="proto-pills">
       <span class="proto-pill pp-vmess">VMess</span>
       <span class="proto-pill pp-vless">VLess</span>
@@ -463,6 +599,50 @@ vless://uuid@1.2.3.4:443?type=ws&security=tls&host=ex.com&path=%2Fws&sni=ex.com#
           </div>
         </div>
 
+        <!-- ── Config Naming Options (shared by range/manual) ── -->
+        <div class="naming-section">
+          <label class="inp-label">🏷️ نامگذاری کانفیگ‌های تولید شده</label>
+          <div class="naming-modes">
+            <label class="radio-row">
+              <input type="radio" name="namingMode" value="default" checked onchange="onNamingModeChange()" />
+              <span>پیش‌فرض — بدون تغییر نام (حالت فعلی)</span>
+            </label>
+            <label class="radio-row">
+              <input type="radio" name="namingMode" value="name_address" onchange="onNamingModeChange()" />
+              <span>نام + آدرس &nbsp;<code style="color:var(--text3)">مثال: MyName-1.2.3.4</code></span>
+            </label>
+            <label class="radio-row">
+              <input type="radio" name="namingMode" value="name_number_address" onchange="onNamingModeChange()" />
+              <span>نام + شماره + آدرس &nbsp;<code style="color:var(--text3)">مثال: MyName-1-1.2.3.4</code></span>
+            </label>
+            <label class="radio-row">
+              <input type="radio" name="namingMode" value="name_number_address_location" onchange="onNamingModeChange()" />
+              <span>نام + شماره + آدرس + لوکیشن (کشور) &nbsp;<code style="color:var(--text3)">مثال: MyName-1-1.2.3.4-🇩🇪DE</code></span>
+            </label>
+          </div>
+          <div id="namingOptions" class="hidden">
+            <div class="naming-fields">
+              <div>
+                <label class="inp-label">نام (فعلی یا دلخواه)</label>
+                <input type="text" id="namingBaseName" placeholder="نام کانفیگ فعلی استفاده می‌شود" oninput="updateNamingPreview()" />
+              </div>
+              <div>
+                <label class="inp-label">جداکننده</label>
+                <input type="text" id="namingSeparator" value="-" maxlength="3" oninput="updateNamingPreview()" />
+              </div>
+            </div>
+            <div id="namingStartNumberRow" class="hidden mt10" style="max-width:160px">
+              <label class="inp-label">شماره شروع</label>
+              <input type="number" id="namingStartNumber" value="1" min="0" oninput="updateNamingPreview()" />
+            </div>
+          </div>
+          <p class="help hidden" id="namingLocationNote">🌍 در این گزینه، آدرس هر کانفیگ صرفاً برای تشخیص کشور به سرویس آنلاین <code style="color:var(--text3)">ipapi.co</code> ارسال می‌شود (فقط هنگام تولید، و نتیجه در مرورگر کش می‌شود تا دوباره درخواست نرود).</p>
+          <p class="help" id="namingPreview"></p>
+          <p class="help hidden" id="namingLocationProgress" style="color:var(--cyan);font-weight:600"></p>
+        </div>
+
+        <div class="divider"></div>
+
         <!-- ── Range Mode ─────────────────────────── -->
         <div id="makerRangeMode">
           <div class="maker-ranges-scroll" id="makerRangesContainer">
@@ -477,7 +657,7 @@ vless://uuid@1.2.3.4:443?type=ws&security=tls&host=ex.com&path=%2Fws&sni=ex.com#
               <label class="inp-label">تعداد کانفیگ خروجی</label>
               <input type="number" id="genCountInput" value="10" min="1" max="5000" placeholder="۱۰" />
             </div>
-            <button class="btn btn-emerald" onclick="generateConfigs()">⚡ &nbsp;تولید</button>
+            <button class="btn btn-emerald" id="genRangeBtn" onclick="generateConfigs()">⚡ &nbsp;تولید</button>
           </div>
         </div>
 
@@ -491,7 +671,7 @@ vless://uuid@1.2.3.4:443?type=ws&security=tls&host=ex.com&path=%2Fws&sni=ex.com#
 example.com
 2001:db8::1"></textarea>
           <p class="help"><b>آی‌پی تکی</b> · <b>رنج (x-y)</b> · <b>CIDR (/24)</b> · <b>دامنه</b> · <b>IPv6</b></p>
-          <button class="btn btn-emerald btn-full mt10" onclick="generateConfigs()">⚡ &nbsp;تولید کانفیگ‌ها (همه آی‌پی‌ها)</button>
+          <button class="btn btn-emerald btn-full mt10" id="genManualBtn" onclick="generateConfigs()">⚡ &nbsp;تولید کانفیگ‌ها (همه آی‌پی‌ها)</button>
         </div>
       </div>
     </div>
@@ -614,6 +794,92 @@ example.com
             </div>
             <div class="accrd-body">
               <div class="accrd-inner" id="grp-popular_ips"></div>
+            </div>
+          </div>
+
+          <!-- ➕ افزوده‌شده: زیرشبکه‌های Clean تکمیلی (رنج‌های رسمی بالا دست‌نخورده باقی ماندند) -->
+          <div class="accrd">
+            <div class="accrd-head" onclick="toggleAccrd(this)">
+              <input type="checkbox" class="group-chk" data-group="clean_subnets_extra" onclick="e=>e.stopPropagation()" onchange="toggleGroupCheck('clean_subnets_extra', this.checked)" />
+              <span class="accrd-title">✨ زیرشبکه‌های Clean (تکمیلی)</span>
+              <span class="accrd-count">23 رنج CIDR</span>
+              <span class="accrd-toggle">▼</span>
+            </div>
+            <div class="accrd-body">
+              <div class="accrd-inner" id="grp-clean_subnets_extra"></div>
+            </div>
+          </div>
+
+          <!-- ➕ افزوده‌شده: آی‌پی‌های محبوب تکمیلی -->
+          <div class="accrd">
+            <div class="accrd-head" onclick="toggleAccrd(this)">
+              <input type="checkbox" class="group-chk" data-group="popular_ips_extra" onclick="e=>e.stopPropagation()" onchange="toggleGroupCheck('popular_ips_extra', this.checked)" />
+              <span class="accrd-title">⭐ آی‌پی‌های محبوب (تکمیلی)</span>
+              <span class="accrd-count">55 آی‌پی تکی</span>
+              <span class="accrd-toggle">▼</span>
+            </div>
+            <div class="accrd-body">
+              <div class="accrd-inner" id="grp-popular_ips_extra"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ➕ افزوده‌شده: کتابخانه سایر CDN ها (Fastly / Amazon CloudFront / Google Cloud) — کارت کاملاً جدید، هیچ‌چیزی از کارت‌های بالا تغییر نکرده -->
+        <div class="card" style="padding:14px">
+          <div class="card-head" style="margin-bottom:10px">
+            <div class="card-icon" style="background:linear-gradient(135deg,#0ea5e9,#0369a1);font-size:16px">🌍</div>
+            <div><div class="card-title">کتابخانه سایر CDN ها</div><div class="card-sub">Fastly · Amazon CloudFront · Google Cloud</div></div>
+          </div>
+
+          <!-- Fastly IPv4 -->
+          <div class="accrd">
+            <div class="accrd-head" onclick="toggleAccrd(this)">
+              <input type="checkbox" class="group-chk" data-group="fastly_v4" onclick="e=>e.stopPropagation()" onchange="toggleGroupCheck('fastly_v4', this.checked)" />
+              <span class="accrd-title">🚀 Fastly — رنج‌های رسمی IPv4</span>
+              <span class="accrd-count">19 رنج CIDR</span>
+              <span class="accrd-toggle">▼</span>
+            </div>
+            <div class="accrd-body">
+              <div class="accrd-inner" id="grp-fastly_v4"></div>
+            </div>
+          </div>
+
+          <!-- Fastly IPv6 -->
+          <div class="accrd">
+            <div class="accrd-head" onclick="toggleAccrd(this)">
+              <input type="checkbox" class="group-chk" data-group="fastly_v6" onclick="e=>e.stopPropagation()" onchange="toggleGroupCheck('fastly_v6', this.checked)" />
+              <span class="accrd-title">🚀 Fastly — رنج‌های رسمی IPv6</span>
+              <span class="accrd-count">2 رنج CIDR</span>
+              <span class="accrd-toggle">▼</span>
+            </div>
+            <div class="accrd-body">
+              <div class="accrd-inner" id="grp-fastly_v6"></div>
+            </div>
+          </div>
+
+          <!-- Amazon CloudFront -->
+          <div class="accrd">
+            <div class="accrd-head" onclick="toggleAccrd(this)">
+              <input type="checkbox" class="group-chk" data-group="cloudfront_v4" onclick="e=>e.stopPropagation()" onchange="toggleGroupCheck('cloudfront_v4', this.checked)" />
+              <span class="accrd-title">📦 Amazon CloudFront — رنج‌های منتخب</span>
+              <span class="accrd-count">24 رنج CIDR</span>
+              <span class="accrd-toggle">▼</span>
+            </div>
+            <div class="accrd-body">
+              <div class="accrd-inner" id="grp-cloudfront_v4"></div>
+            </div>
+          </div>
+
+          <!-- Google Cloud -->
+          <div class="accrd">
+            <div class="accrd-head" onclick="toggleAccrd(this)">
+              <input type="checkbox" class="group-chk" data-group="google_v4" onclick="e=>e.stopPropagation()" onchange="toggleGroupCheck('google_v4', this.checked)" />
+              <span class="accrd-title">🌍 Google Cloud — Global LB / CDN</span>
+              <span class="accrd-count">43 رنج CIDR</span>
+              <span class="accrd-toggle">▼</span>
+            </div>
+            <div class="accrd-body">
+              <div class="accrd-inner" id="grp-google_v4"></div>
             </div>
           </div>
         </div>
@@ -778,7 +1044,2317 @@ vless://uuid@5.6.7.8:443?type=ws&security=tls#Test2"></textarea>
 
 </div><!-- /wrap -->
 
-<footer>V2Ray Config Maker &nbsp;·&nbsp; <a href="https://github.com/alireza-aminzadeh/cconfig-maker" target="_blank" rel="noopener noreferrer">GitHub</a> &nbsp;·&nbsp; <a href="https://alireza-aminzadeh.github.io/cconfig-maker/">Live</a> &nbsp;·&nbsp; Pure JS + CSS &nbsp;·&nbsp; VMess · VLess · WS · gRPC · HTTPUpgrade · XHTTP · Ping Tester</footer>
+<footer>V2Ray Config Maker &nbsp;·&nbsp; Pure JS + CSS &nbsp;·&nbsp; VMess · VLess · WS · gRPC · HTTPUpgrade · XHTTP · Ping Tester</footer>
+<!-- ═══════════════════════════════════════════════ -->
+<!--  VENDOR: QR Code Generator (MIT License)       -->
+<!--  https://github.com/kazuhikoarase/qrcode-generator -->
+<!--  Embedded inline (not via CDN) so this tool    -->
+<!--  stays a single, dependency-free HTML file.    -->
+<!-- ═══════════════════════════════════════════════ -->
+<script>
+//---------------------------------------------------------------------
+//
+// QR Code Generator for JavaScript
+//
+// Copyright (c) 2009 Kazuhiko Arase
+//
+// URL: http://www.d-project.com/
+//
+// Licensed under the MIT license:
+//  http://www.opensource.org/licenses/mit-license.php
+//
+// The word 'QR Code' is registered trademark of
+// DENSO WAVE INCORPORATED
+//  http://www.denso-wave.com/qrcode/faqpatent-e.html
+//
+//---------------------------------------------------------------------
+
+var qrcode = function() {
+
+  //---------------------------------------------------------------------
+  // qrcode
+  //---------------------------------------------------------------------
+
+  /**
+   * qrcode
+   * @param typeNumber 1 to 40
+   * @param errorCorrectionLevel 'L','M','Q','H'
+   */
+  var qrcode = function(typeNumber, errorCorrectionLevel) {
+
+    var PAD0 = 0xEC;
+    var PAD1 = 0x11;
+
+    var _typeNumber = typeNumber;
+    var _errorCorrectionLevel = QRErrorCorrectionLevel[errorCorrectionLevel];
+    var _modules = null;
+    var _moduleCount = 0;
+    var _dataCache = null;
+    var _dataList = [];
+
+    var _this = {};
+
+    var makeImpl = function(test, maskPattern) {
+
+      _moduleCount = _typeNumber * 4 + 17;
+      _modules = function(moduleCount) {
+        var modules = new Array(moduleCount);
+        for (var row = 0; row < moduleCount; row += 1) {
+          modules[row] = new Array(moduleCount);
+          for (var col = 0; col < moduleCount; col += 1) {
+            modules[row][col] = null;
+          }
+        }
+        return modules;
+      }(_moduleCount);
+
+      setupPositionProbePattern(0, 0);
+      setupPositionProbePattern(_moduleCount - 7, 0);
+      setupPositionProbePattern(0, _moduleCount - 7);
+      setupPositionAdjustPattern();
+      setupTimingPattern();
+      setupTypeInfo(test, maskPattern);
+
+      if (_typeNumber >= 7) {
+        setupTypeNumber(test);
+      }
+
+      if (_dataCache == null) {
+        _dataCache = createData(_typeNumber, _errorCorrectionLevel, _dataList);
+      }
+
+      mapData(_dataCache, maskPattern);
+    };
+
+    var setupPositionProbePattern = function(row, col) {
+
+      for (var r = -1; r <= 7; r += 1) {
+
+        if (row + r <= -1 || _moduleCount <= row + r) continue;
+
+        for (var c = -1; c <= 7; c += 1) {
+
+          if (col + c <= -1 || _moduleCount <= col + c) continue;
+
+          if ( (0 <= r && r <= 6 && (c == 0 || c == 6) )
+              || (0 <= c && c <= 6 && (r == 0 || r == 6) )
+              || (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
+            _modules[row + r][col + c] = true;
+          } else {
+            _modules[row + r][col + c] = false;
+          }
+        }
+      }
+    };
+
+    var getBestMaskPattern = function() {
+
+      var minLostPoint = 0;
+      var pattern = 0;
+
+      for (var i = 0; i < 8; i += 1) {
+
+        makeImpl(true, i);
+
+        var lostPoint = QRUtil.getLostPoint(_this);
+
+        if (i == 0 || minLostPoint > lostPoint) {
+          minLostPoint = lostPoint;
+          pattern = i;
+        }
+      }
+
+      return pattern;
+    };
+
+    var setupTimingPattern = function() {
+
+      for (var r = 8; r < _moduleCount - 8; r += 1) {
+        if (_modules[r][6] != null) {
+          continue;
+        }
+        _modules[r][6] = (r % 2 == 0);
+      }
+
+      for (var c = 8; c < _moduleCount - 8; c += 1) {
+        if (_modules[6][c] != null) {
+          continue;
+        }
+        _modules[6][c] = (c % 2 == 0);
+      }
+    };
+
+    var setupPositionAdjustPattern = function() {
+
+      var pos = QRUtil.getPatternPosition(_typeNumber);
+
+      for (var i = 0; i < pos.length; i += 1) {
+
+        for (var j = 0; j < pos.length; j += 1) {
+
+          var row = pos[i];
+          var col = pos[j];
+
+          if (_modules[row][col] != null) {
+            continue;
+          }
+
+          for (var r = -2; r <= 2; r += 1) {
+
+            for (var c = -2; c <= 2; c += 1) {
+
+              if (r == -2 || r == 2 || c == -2 || c == 2
+                  || (r == 0 && c == 0) ) {
+                _modules[row + r][col + c] = true;
+              } else {
+                _modules[row + r][col + c] = false;
+              }
+            }
+          }
+        }
+      }
+    };
+
+    var setupTypeNumber = function(test) {
+
+      var bits = QRUtil.getBCHTypeNumber(_typeNumber);
+
+      for (var i = 0; i < 18; i += 1) {
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+        _modules[Math.floor(i / 3)][i % 3 + _moduleCount - 8 - 3] = mod;
+      }
+
+      for (var i = 0; i < 18; i += 1) {
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+        _modules[i % 3 + _moduleCount - 8 - 3][Math.floor(i / 3)] = mod;
+      }
+    };
+
+    var setupTypeInfo = function(test, maskPattern) {
+
+      var data = (_errorCorrectionLevel << 3) | maskPattern;
+      var bits = QRUtil.getBCHTypeInfo(data);
+
+      // vertical
+      for (var i = 0; i < 15; i += 1) {
+
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+
+        if (i < 6) {
+          _modules[i][8] = mod;
+        } else if (i < 8) {
+          _modules[i + 1][8] = mod;
+        } else {
+          _modules[_moduleCount - 15 + i][8] = mod;
+        }
+      }
+
+      // horizontal
+      for (var i = 0; i < 15; i += 1) {
+
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+
+        if (i < 8) {
+          _modules[8][_moduleCount - i - 1] = mod;
+        } else if (i < 9) {
+          _modules[8][15 - i - 1 + 1] = mod;
+        } else {
+          _modules[8][15 - i - 1] = mod;
+        }
+      }
+
+      // fixed module
+      _modules[_moduleCount - 8][8] = (!test);
+    };
+
+    var mapData = function(data, maskPattern) {
+
+      var inc = -1;
+      var row = _moduleCount - 1;
+      var bitIndex = 7;
+      var byteIndex = 0;
+      var maskFunc = QRUtil.getMaskFunction(maskPattern);
+
+      for (var col = _moduleCount - 1; col > 0; col -= 2) {
+
+        if (col == 6) col -= 1;
+
+        while (true) {
+
+          for (var c = 0; c < 2; c += 1) {
+
+            if (_modules[row][col - c] == null) {
+
+              var dark = false;
+
+              if (byteIndex < data.length) {
+                dark = ( ( (data[byteIndex] >>> bitIndex) & 1) == 1);
+              }
+
+              var mask = maskFunc(row, col - c);
+
+              if (mask) {
+                dark = !dark;
+              }
+
+              _modules[row][col - c] = dark;
+              bitIndex -= 1;
+
+              if (bitIndex == -1) {
+                byteIndex += 1;
+                bitIndex = 7;
+              }
+            }
+          }
+
+          row += inc;
+
+          if (row < 0 || _moduleCount <= row) {
+            row -= inc;
+            inc = -inc;
+            break;
+          }
+        }
+      }
+    };
+
+    var createBytes = function(buffer, rsBlocks) {
+
+      var offset = 0;
+
+      var maxDcCount = 0;
+      var maxEcCount = 0;
+
+      var dcdata = new Array(rsBlocks.length);
+      var ecdata = new Array(rsBlocks.length);
+
+      for (var r = 0; r < rsBlocks.length; r += 1) {
+
+        var dcCount = rsBlocks[r].dataCount;
+        var ecCount = rsBlocks[r].totalCount - dcCount;
+
+        maxDcCount = Math.max(maxDcCount, dcCount);
+        maxEcCount = Math.max(maxEcCount, ecCount);
+
+        dcdata[r] = new Array(dcCount);
+
+        for (var i = 0; i < dcdata[r].length; i += 1) {
+          dcdata[r][i] = 0xff & buffer.getBuffer()[i + offset];
+        }
+        offset += dcCount;
+
+        var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+        var rawPoly = qrPolynomial(dcdata[r], rsPoly.getLength() - 1);
+
+        var modPoly = rawPoly.mod(rsPoly);
+        ecdata[r] = new Array(rsPoly.getLength() - 1);
+        for (var i = 0; i < ecdata[r].length; i += 1) {
+          var modIndex = i + modPoly.getLength() - ecdata[r].length;
+          ecdata[r][i] = (modIndex >= 0)? modPoly.getAt(modIndex) : 0;
+        }
+      }
+
+      var totalCodeCount = 0;
+      for (var i = 0; i < rsBlocks.length; i += 1) {
+        totalCodeCount += rsBlocks[i].totalCount;
+      }
+
+      var data = new Array(totalCodeCount);
+      var index = 0;
+
+      for (var i = 0; i < maxDcCount; i += 1) {
+        for (var r = 0; r < rsBlocks.length; r += 1) {
+          if (i < dcdata[r].length) {
+            data[index] = dcdata[r][i];
+            index += 1;
+          }
+        }
+      }
+
+      for (var i = 0; i < maxEcCount; i += 1) {
+        for (var r = 0; r < rsBlocks.length; r += 1) {
+          if (i < ecdata[r].length) {
+            data[index] = ecdata[r][i];
+            index += 1;
+          }
+        }
+      }
+
+      return data;
+    };
+
+    var createData = function(typeNumber, errorCorrectionLevel, dataList) {
+
+      var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectionLevel);
+
+      var buffer = qrBitBuffer();
+
+      for (var i = 0; i < dataList.length; i += 1) {
+        var data = dataList[i];
+        buffer.put(data.getMode(), 4);
+        buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+        data.write(buffer);
+      }
+
+      // calc num max data.
+      var totalDataCount = 0;
+      for (var i = 0; i < rsBlocks.length; i += 1) {
+        totalDataCount += rsBlocks[i].dataCount;
+      }
+
+      if (buffer.getLengthInBits() > totalDataCount * 8) {
+        throw 'code length overflow. ('
+          + buffer.getLengthInBits()
+          + '>'
+          + totalDataCount * 8
+          + ')';
+      }
+
+      // end code
+      if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
+        buffer.put(0, 4);
+      }
+
+      // padding
+      while (buffer.getLengthInBits() % 8 != 0) {
+        buffer.putBit(false);
+      }
+
+      // padding
+      while (true) {
+
+        if (buffer.getLengthInBits() >= totalDataCount * 8) {
+          break;
+        }
+        buffer.put(PAD0, 8);
+
+        if (buffer.getLengthInBits() >= totalDataCount * 8) {
+          break;
+        }
+        buffer.put(PAD1, 8);
+      }
+
+      return createBytes(buffer, rsBlocks);
+    };
+
+    _this.addData = function(data, mode) {
+
+      mode = mode || 'Byte';
+
+      var newData = null;
+
+      switch(mode) {
+      case 'Numeric' :
+        newData = qrNumber(data);
+        break;
+      case 'Alphanumeric' :
+        newData = qrAlphaNum(data);
+        break;
+      case 'Byte' :
+        newData = qr8BitByte(data);
+        break;
+      case 'Kanji' :
+        newData = qrKanji(data);
+        break;
+      default :
+        throw 'mode:' + mode;
+      }
+
+      _dataList.push(newData);
+      _dataCache = null;
+    };
+
+    _this.isDark = function(row, col) {
+      if (row < 0 || _moduleCount <= row || col < 0 || _moduleCount <= col) {
+        throw row + ',' + col;
+      }
+      return _modules[row][col];
+    };
+
+    _this.getModuleCount = function() {
+      return _moduleCount;
+    };
+
+    _this.make = function() {
+      if (_typeNumber < 1) {
+        var typeNumber = 1;
+
+        for (; typeNumber < 40; typeNumber++) {
+          var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, _errorCorrectionLevel);
+          var buffer = qrBitBuffer();
+
+          for (var i = 0; i < _dataList.length; i++) {
+            var data = _dataList[i];
+            buffer.put(data.getMode(), 4);
+            buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+            data.write(buffer);
+          }
+
+          var totalDataCount = 0;
+          for (var i = 0; i < rsBlocks.length; i++) {
+            totalDataCount += rsBlocks[i].dataCount;
+          }
+
+          if (buffer.getLengthInBits() <= totalDataCount * 8) {
+            break;
+          }
+        }
+
+        _typeNumber = typeNumber;
+      }
+
+      makeImpl(false, getBestMaskPattern() );
+    };
+
+    _this.createTableTag = function(cellSize, margin) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var qrHtml = '';
+
+      qrHtml += '<table style="';
+      qrHtml += ' border-width: 0px; border-style: none;';
+      qrHtml += ' border-collapse: collapse;';
+      qrHtml += ' padding: 0px; margin: ' + margin + 'px;';
+      qrHtml += '">';
+      qrHtml += '<tbody>';
+
+      for (var r = 0; r < _this.getModuleCount(); r += 1) {
+
+        qrHtml += '<tr>';
+
+        for (var c = 0; c < _this.getModuleCount(); c += 1) {
+          qrHtml += '<td style="';
+          qrHtml += ' border-width: 0px; border-style: none;';
+          qrHtml += ' border-collapse: collapse;';
+          qrHtml += ' padding: 0px; margin: 0px;';
+          qrHtml += ' width: ' + cellSize + 'px;';
+          qrHtml += ' height: ' + cellSize + 'px;';
+          qrHtml += ' background-color: ';
+          qrHtml += _this.isDark(r, c)? '#000000' : '#ffffff';
+          qrHtml += ';';
+          qrHtml += '"/>';
+        }
+
+        qrHtml += '</tr>';
+      }
+
+      qrHtml += '</tbody>';
+      qrHtml += '</table>';
+
+      return qrHtml;
+    };
+
+    _this.createSvgTag = function(cellSize, margin, alt, title) {
+
+      var opts = {};
+      if (typeof arguments[0] == 'object') {
+        // Called by options.
+        opts = arguments[0];
+        // overwrite cellSize and margin.
+        cellSize = opts.cellSize;
+        margin = opts.margin;
+        alt = opts.alt;
+        title = opts.title;
+      }
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      // Compose alt property surrogate
+      alt = (typeof alt === 'string') ? {text: alt} : alt || {};
+      alt.text = alt.text || null;
+      alt.id = (alt.text) ? alt.id || 'qrcode-description' : null;
+
+      // Compose title property surrogate
+      title = (typeof title === 'string') ? {text: title} : title || {};
+      title.text = title.text || null;
+      title.id = (title.text) ? title.id || 'qrcode-title' : null;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var c, mc, r, mr, qrSvg='', rect;
+
+      rect = 'l' + cellSize + ',0 0,' + cellSize +
+        ' -' + cellSize + ',0 0,-' + cellSize + 'z ';
+
+      qrSvg += '<svg version="1.1" xmlns="http://www.w3.org/2000/svg"';
+      qrSvg += !opts.scalable ? ' width="' + size + 'px" height="' + size + 'px"' : '';
+      qrSvg += ' viewBox="0 0 ' + size + ' ' + size + '" ';
+      qrSvg += ' preserveAspectRatio="xMinYMin meet"';
+      qrSvg += (title.text || alt.text) ? ' role="img" aria-labelledby="' +
+          escapeXml([title.id, alt.id].join(' ').trim() ) + '"' : '';
+      qrSvg += '>';
+      qrSvg += (title.text) ? '<title id="' + escapeXml(title.id) + '">' +
+          escapeXml(title.text) + '</title>' : '';
+      qrSvg += (alt.text) ? '<description id="' + escapeXml(alt.id) + '">' +
+          escapeXml(alt.text) + '</description>' : '';
+      qrSvg += '<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>';
+      qrSvg += '<path d="';
+
+      for (r = 0; r < _this.getModuleCount(); r += 1) {
+        mr = r * cellSize + margin;
+        for (c = 0; c < _this.getModuleCount(); c += 1) {
+          if (_this.isDark(r, c) ) {
+            mc = c*cellSize+margin;
+            qrSvg += 'M' + mc + ',' + mr + rect;
+          }
+        }
+      }
+
+      qrSvg += '" stroke="transparent" fill="black"/>';
+      qrSvg += '</svg>';
+
+      return qrSvg;
+    };
+
+    _this.createDataURL = function(cellSize, margin) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      return createDataURL(size, size, function(x, y) {
+        if (min <= x && x < max && min <= y && y < max) {
+          var c = Math.floor( (x - min) / cellSize);
+          var r = Math.floor( (y - min) / cellSize);
+          return _this.isDark(r, c)? 0 : 1;
+        } else {
+          return 1;
+        }
+      } );
+    };
+
+    _this.createImgTag = function(cellSize, margin, alt) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+
+      var img = '';
+      img += '<img';
+      img += '\u0020src="';
+      img += _this.createDataURL(cellSize, margin);
+      img += '"';
+      img += '\u0020width="';
+      img += size;
+      img += '"';
+      img += '\u0020height="';
+      img += size;
+      img += '"';
+      if (alt) {
+        img += '\u0020alt="';
+        img += escapeXml(alt);
+        img += '"';
+      }
+      img += '/>';
+
+      return img;
+    };
+
+    var escapeXml = function(s) {
+      var escaped = '';
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charAt(i);
+        switch(c) {
+        case '<': escaped += '&lt;'; break;
+        case '>': escaped += '&gt;'; break;
+        case '&': escaped += '&amp;'; break;
+        case '"': escaped += '&quot;'; break;
+        default : escaped += c; break;
+        }
+      }
+      return escaped;
+    };
+
+    var _createHalfASCII = function(margin) {
+      var cellSize = 1;
+      margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      var y, x, r1, r2, p;
+
+      var blocks = {
+        '██': '█',
+        '█ ': '▀',
+        ' █': '▄',
+        '  ': ' '
+      };
+
+      var blocksLastLineNoMargin = {
+        '██': '▀',
+        '█ ': '▀',
+        ' █': ' ',
+        '  ': ' '
+      };
+
+      var ascii = '';
+      for (y = 0; y < size; y += 2) {
+        r1 = Math.floor((y - min) / cellSize);
+        r2 = Math.floor((y + 1 - min) / cellSize);
+        for (x = 0; x < size; x += 1) {
+          p = '█';
+
+          if (min <= x && x < max && min <= y && y < max && _this.isDark(r1, Math.floor((x - min) / cellSize))) {
+            p = ' ';
+          }
+
+          if (min <= x && x < max && min <= y+1 && y+1 < max && _this.isDark(r2, Math.floor((x - min) / cellSize))) {
+            p += ' ';
+          }
+          else {
+            p += '█';
+          }
+
+          // Output 2 characters per pixel, to create full square. 1 character per pixels gives only half width of square.
+          ascii += (margin < 1 && y+1 >= max) ? blocksLastLineNoMargin[p] : blocks[p];
+        }
+
+        ascii += '\n';
+      }
+
+      if (size % 2 && margin > 0) {
+        return ascii.substring(0, ascii.length - size - 1) + Array(size+1).join('▀');
+      }
+
+      return ascii.substring(0, ascii.length-1);
+    };
+
+    _this.createASCII = function(cellSize, margin) {
+      cellSize = cellSize || 1;
+
+      if (cellSize < 2) {
+        return _createHalfASCII(margin);
+      }
+
+      cellSize -= 1;
+      margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      var y, x, r, p;
+
+      var white = Array(cellSize+1).join('██');
+      var black = Array(cellSize+1).join('  ');
+
+      var ascii = '';
+      var line = '';
+      for (y = 0; y < size; y += 1) {
+        r = Math.floor( (y - min) / cellSize);
+        line = '';
+        for (x = 0; x < size; x += 1) {
+          p = 1;
+
+          if (min <= x && x < max && min <= y && y < max && _this.isDark(r, Math.floor((x - min) / cellSize))) {
+            p = 0;
+          }
+
+          // Output 2 characters per pixel, to create full square. 1 character per pixels gives only half width of square.
+          line += p ? white : black;
+        }
+
+        for (r = 0; r < cellSize; r += 1) {
+          ascii += line + '\n';
+        }
+      }
+
+      return ascii.substring(0, ascii.length-1);
+    };
+
+    _this.renderTo2dContext = function(context, cellSize) {
+      cellSize = cellSize || 2;
+      var length = _this.getModuleCount();
+      for (var row = 0; row < length; row++) {
+        for (var col = 0; col < length; col++) {
+          context.fillStyle = _this.isDark(row, col) ? 'black' : 'white';
+          context.fillRect(row * cellSize, col * cellSize, cellSize, cellSize);
+        }
+      }
+    }
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrcode.stringToBytes
+  //---------------------------------------------------------------------
+
+  qrcode.stringToBytesFuncs = {
+    'default' : function(s) {
+      var bytes = [];
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charCodeAt(i);
+        bytes.push(c & 0xff);
+      }
+      return bytes;
+    }
+  };
+
+  qrcode.stringToBytes = qrcode.stringToBytesFuncs['default'];
+
+  //---------------------------------------------------------------------
+  // qrcode.createStringToBytes
+  //---------------------------------------------------------------------
+
+  /**
+   * @param unicodeData base64 string of byte array.
+   * [16bit Unicode],[16bit Bytes], ...
+   * @param numChars
+   */
+  qrcode.createStringToBytes = function(unicodeData, numChars) {
+
+    // create conversion map.
+
+    var unicodeMap = function() {
+
+      var bin = base64DecodeInputStream(unicodeData);
+      var read = function() {
+        var b = bin.read();
+        if (b == -1) throw 'eof';
+        return b;
+      };
+
+      var count = 0;
+      var unicodeMap = {};
+      while (true) {
+        var b0 = bin.read();
+        if (b0 == -1) break;
+        var b1 = read();
+        var b2 = read();
+        var b3 = read();
+        var k = String.fromCharCode( (b0 << 8) | b1);
+        var v = (b2 << 8) | b3;
+        unicodeMap[k] = v;
+        count += 1;
+      }
+      if (count != numChars) {
+        throw count + ' != ' + numChars;
+      }
+
+      return unicodeMap;
+    }();
+
+    var unknownChar = '?'.charCodeAt(0);
+
+    return function(s) {
+      var bytes = [];
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charCodeAt(i);
+        if (c < 128) {
+          bytes.push(c);
+        } else {
+          var b = unicodeMap[s.charAt(i)];
+          if (typeof b == 'number') {
+            if ( (b & 0xff) == b) {
+              // 1byte
+              bytes.push(b);
+            } else {
+              // 2bytes
+              bytes.push(b >>> 8);
+              bytes.push(b & 0xff);
+            }
+          } else {
+            bytes.push(unknownChar);
+          }
+        }
+      }
+      return bytes;
+    };
+  };
+
+  //---------------------------------------------------------------------
+  // QRMode
+  //---------------------------------------------------------------------
+
+  var QRMode = {
+    MODE_NUMBER :    1 << 0,
+    MODE_ALPHA_NUM : 1 << 1,
+    MODE_8BIT_BYTE : 1 << 2,
+    MODE_KANJI :     1 << 3
+  };
+
+  //---------------------------------------------------------------------
+  // QRErrorCorrectionLevel
+  //---------------------------------------------------------------------
+
+  var QRErrorCorrectionLevel = {
+    L : 1,
+    M : 0,
+    Q : 3,
+    H : 2
+  };
+
+  //---------------------------------------------------------------------
+  // QRMaskPattern
+  //---------------------------------------------------------------------
+
+  var QRMaskPattern = {
+    PATTERN000 : 0,
+    PATTERN001 : 1,
+    PATTERN010 : 2,
+    PATTERN011 : 3,
+    PATTERN100 : 4,
+    PATTERN101 : 5,
+    PATTERN110 : 6,
+    PATTERN111 : 7
+  };
+
+  //---------------------------------------------------------------------
+  // QRUtil
+  //---------------------------------------------------------------------
+
+  var QRUtil = function() {
+
+    var PATTERN_POSITION_TABLE = [
+      [],
+      [6, 18],
+      [6, 22],
+      [6, 26],
+      [6, 30],
+      [6, 34],
+      [6, 22, 38],
+      [6, 24, 42],
+      [6, 26, 46],
+      [6, 28, 50],
+      [6, 30, 54],
+      [6, 32, 58],
+      [6, 34, 62],
+      [6, 26, 46, 66],
+      [6, 26, 48, 70],
+      [6, 26, 50, 74],
+      [6, 30, 54, 78],
+      [6, 30, 56, 82],
+      [6, 30, 58, 86],
+      [6, 34, 62, 90],
+      [6, 28, 50, 72, 94],
+      [6, 26, 50, 74, 98],
+      [6, 30, 54, 78, 102],
+      [6, 28, 54, 80, 106],
+      [6, 32, 58, 84, 110],
+      [6, 30, 58, 86, 114],
+      [6, 34, 62, 90, 118],
+      [6, 26, 50, 74, 98, 122],
+      [6, 30, 54, 78, 102, 126],
+      [6, 26, 52, 78, 104, 130],
+      [6, 30, 56, 82, 108, 134],
+      [6, 34, 60, 86, 112, 138],
+      [6, 30, 58, 86, 114, 142],
+      [6, 34, 62, 90, 118, 146],
+      [6, 30, 54, 78, 102, 126, 150],
+      [6, 24, 50, 76, 102, 128, 154],
+      [6, 28, 54, 80, 106, 132, 158],
+      [6, 32, 58, 84, 110, 136, 162],
+      [6, 26, 54, 82, 110, 138, 166],
+      [6, 30, 58, 86, 114, 142, 170]
+    ];
+    var G15 = (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0);
+    var G18 = (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0);
+    var G15_MASK = (1 << 14) | (1 << 12) | (1 << 10) | (1 << 4) | (1 << 1);
+
+    var _this = {};
+
+    var getBCHDigit = function(data) {
+      var digit = 0;
+      while (data != 0) {
+        digit += 1;
+        data >>>= 1;
+      }
+      return digit;
+    };
+
+    _this.getBCHTypeInfo = function(data) {
+      var d = data << 10;
+      while (getBCHDigit(d) - getBCHDigit(G15) >= 0) {
+        d ^= (G15 << (getBCHDigit(d) - getBCHDigit(G15) ) );
+      }
+      return ( (data << 10) | d) ^ G15_MASK;
+    };
+
+    _this.getBCHTypeNumber = function(data) {
+      var d = data << 12;
+      while (getBCHDigit(d) - getBCHDigit(G18) >= 0) {
+        d ^= (G18 << (getBCHDigit(d) - getBCHDigit(G18) ) );
+      }
+      return (data << 12) | d;
+    };
+
+    _this.getPatternPosition = function(typeNumber) {
+      return PATTERN_POSITION_TABLE[typeNumber - 1];
+    };
+
+    _this.getMaskFunction = function(maskPattern) {
+
+      switch (maskPattern) {
+
+      case QRMaskPattern.PATTERN000 :
+        return function(i, j) { return (i + j) % 2 == 0; };
+      case QRMaskPattern.PATTERN001 :
+        return function(i, j) { return i % 2 == 0; };
+      case QRMaskPattern.PATTERN010 :
+        return function(i, j) { return j % 3 == 0; };
+      case QRMaskPattern.PATTERN011 :
+        return function(i, j) { return (i + j) % 3 == 0; };
+      case QRMaskPattern.PATTERN100 :
+        return function(i, j) { return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 == 0; };
+      case QRMaskPattern.PATTERN101 :
+        return function(i, j) { return (i * j) % 2 + (i * j) % 3 == 0; };
+      case QRMaskPattern.PATTERN110 :
+        return function(i, j) { return ( (i * j) % 2 + (i * j) % 3) % 2 == 0; };
+      case QRMaskPattern.PATTERN111 :
+        return function(i, j) { return ( (i * j) % 3 + (i + j) % 2) % 2 == 0; };
+
+      default :
+        throw 'bad maskPattern:' + maskPattern;
+      }
+    };
+
+    _this.getErrorCorrectPolynomial = function(errorCorrectLength) {
+      var a = qrPolynomial([1], 0);
+      for (var i = 0; i < errorCorrectLength; i += 1) {
+        a = a.multiply(qrPolynomial([1, QRMath.gexp(i)], 0) );
+      }
+      return a;
+    };
+
+    _this.getLengthInBits = function(mode, type) {
+
+      if (1 <= type && type < 10) {
+
+        // 1 - 9
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 10;
+        case QRMode.MODE_ALPHA_NUM : return 9;
+        case QRMode.MODE_8BIT_BYTE : return 8;
+        case QRMode.MODE_KANJI     : return 8;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else if (type < 27) {
+
+        // 10 - 26
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 12;
+        case QRMode.MODE_ALPHA_NUM : return 11;
+        case QRMode.MODE_8BIT_BYTE : return 16;
+        case QRMode.MODE_KANJI     : return 10;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else if (type < 41) {
+
+        // 27 - 40
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 14;
+        case QRMode.MODE_ALPHA_NUM : return 13;
+        case QRMode.MODE_8BIT_BYTE : return 16;
+        case QRMode.MODE_KANJI     : return 12;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else {
+        throw 'type:' + type;
+      }
+    };
+
+    _this.getLostPoint = function(qrcode) {
+
+      var moduleCount = qrcode.getModuleCount();
+
+      var lostPoint = 0;
+
+      // LEVEL1
+
+      for (var row = 0; row < moduleCount; row += 1) {
+        for (var col = 0; col < moduleCount; col += 1) {
+
+          var sameCount = 0;
+          var dark = qrcode.isDark(row, col);
+
+          for (var r = -1; r <= 1; r += 1) {
+
+            if (row + r < 0 || moduleCount <= row + r) {
+              continue;
+            }
+
+            for (var c = -1; c <= 1; c += 1) {
+
+              if (col + c < 0 || moduleCount <= col + c) {
+                continue;
+              }
+
+              if (r == 0 && c == 0) {
+                continue;
+              }
+
+              if (dark == qrcode.isDark(row + r, col + c) ) {
+                sameCount += 1;
+              }
+            }
+          }
+
+          if (sameCount > 5) {
+            lostPoint += (3 + sameCount - 5);
+          }
+        }
+      };
+
+      // LEVEL2
+
+      for (var row = 0; row < moduleCount - 1; row += 1) {
+        for (var col = 0; col < moduleCount - 1; col += 1) {
+          var count = 0;
+          if (qrcode.isDark(row, col) ) count += 1;
+          if (qrcode.isDark(row + 1, col) ) count += 1;
+          if (qrcode.isDark(row, col + 1) ) count += 1;
+          if (qrcode.isDark(row + 1, col + 1) ) count += 1;
+          if (count == 0 || count == 4) {
+            lostPoint += 3;
+          }
+        }
+      }
+
+      // LEVEL3
+
+      for (var row = 0; row < moduleCount; row += 1) {
+        for (var col = 0; col < moduleCount - 6; col += 1) {
+          if (qrcode.isDark(row, col)
+              && !qrcode.isDark(row, col + 1)
+              &&  qrcode.isDark(row, col + 2)
+              &&  qrcode.isDark(row, col + 3)
+              &&  qrcode.isDark(row, col + 4)
+              && !qrcode.isDark(row, col + 5)
+              &&  qrcode.isDark(row, col + 6) ) {
+            lostPoint += 40;
+          }
+        }
+      }
+
+      for (var col = 0; col < moduleCount; col += 1) {
+        for (var row = 0; row < moduleCount - 6; row += 1) {
+          if (qrcode.isDark(row, col)
+              && !qrcode.isDark(row + 1, col)
+              &&  qrcode.isDark(row + 2, col)
+              &&  qrcode.isDark(row + 3, col)
+              &&  qrcode.isDark(row + 4, col)
+              && !qrcode.isDark(row + 5, col)
+              &&  qrcode.isDark(row + 6, col) ) {
+            lostPoint += 40;
+          }
+        }
+      }
+
+      // LEVEL4
+
+      var darkCount = 0;
+
+      for (var col = 0; col < moduleCount; col += 1) {
+        for (var row = 0; row < moduleCount; row += 1) {
+          if (qrcode.isDark(row, col) ) {
+            darkCount += 1;
+          }
+        }
+      }
+
+      var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+      lostPoint += ratio * 10;
+
+      return lostPoint;
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // QRMath
+  //---------------------------------------------------------------------
+
+  var QRMath = function() {
+
+    var EXP_TABLE = new Array(256);
+    var LOG_TABLE = new Array(256);
+
+    // initialize tables
+    for (var i = 0; i < 8; i += 1) {
+      EXP_TABLE[i] = 1 << i;
+    }
+    for (var i = 8; i < 256; i += 1) {
+      EXP_TABLE[i] = EXP_TABLE[i - 4]
+        ^ EXP_TABLE[i - 5]
+        ^ EXP_TABLE[i - 6]
+        ^ EXP_TABLE[i - 8];
+    }
+    for (var i = 0; i < 255; i += 1) {
+      LOG_TABLE[EXP_TABLE[i] ] = i;
+    }
+
+    var _this = {};
+
+    _this.glog = function(n) {
+
+      if (n < 1) {
+        throw 'glog(' + n + ')';
+      }
+
+      return LOG_TABLE[n];
+    };
+
+    _this.gexp = function(n) {
+
+      while (n < 0) {
+        n += 255;
+      }
+
+      while (n >= 256) {
+        n -= 255;
+      }
+
+      return EXP_TABLE[n];
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // qrPolynomial
+  //---------------------------------------------------------------------
+
+  function qrPolynomial(num, shift) {
+
+    if (typeof num.length == 'undefined') {
+      throw num.length + '/' + shift;
+    }
+
+    var _num = function() {
+      var offset = 0;
+      while (offset < num.length && num[offset] == 0) {
+        offset += 1;
+      }
+      var _num = new Array(num.length - offset + shift);
+      for (var i = 0; i < num.length - offset; i += 1) {
+        _num[i] = num[i + offset];
+      }
+      return _num;
+    }();
+
+    var _this = {};
+
+    _this.getAt = function(index) {
+      return _num[index];
+    };
+
+    _this.getLength = function() {
+      return _num.length;
+    };
+
+    _this.multiply = function(e) {
+
+      var num = new Array(_this.getLength() + e.getLength() - 1);
+
+      for (var i = 0; i < _this.getLength(); i += 1) {
+        for (var j = 0; j < e.getLength(); j += 1) {
+          num[i + j] ^= QRMath.gexp(QRMath.glog(_this.getAt(i) ) + QRMath.glog(e.getAt(j) ) );
+        }
+      }
+
+      return qrPolynomial(num, 0);
+    };
+
+    _this.mod = function(e) {
+
+      if (_this.getLength() - e.getLength() < 0) {
+        return _this;
+      }
+
+      var ratio = QRMath.glog(_this.getAt(0) ) - QRMath.glog(e.getAt(0) );
+
+      var num = new Array(_this.getLength() );
+      for (var i = 0; i < _this.getLength(); i += 1) {
+        num[i] = _this.getAt(i);
+      }
+
+      for (var i = 0; i < e.getLength(); i += 1) {
+        num[i] ^= QRMath.gexp(QRMath.glog(e.getAt(i) ) + ratio);
+      }
+
+      // recursive call
+      return qrPolynomial(num, 0).mod(e);
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // QRRSBlock
+  //---------------------------------------------------------------------
+
+  var QRRSBlock = function() {
+
+    var RS_BLOCK_TABLE = [
+
+      // L
+      // M
+      // Q
+      // H
+
+      // 1
+      [1, 26, 19],
+      [1, 26, 16],
+      [1, 26, 13],
+      [1, 26, 9],
+
+      // 2
+      [1, 44, 34],
+      [1, 44, 28],
+      [1, 44, 22],
+      [1, 44, 16],
+
+      // 3
+      [1, 70, 55],
+      [1, 70, 44],
+      [2, 35, 17],
+      [2, 35, 13],
+
+      // 4
+      [1, 100, 80],
+      [2, 50, 32],
+      [2, 50, 24],
+      [4, 25, 9],
+
+      // 5
+      [1, 134, 108],
+      [2, 67, 43],
+      [2, 33, 15, 2, 34, 16],
+      [2, 33, 11, 2, 34, 12],
+
+      // 6
+      [2, 86, 68],
+      [4, 43, 27],
+      [4, 43, 19],
+      [4, 43, 15],
+
+      // 7
+      [2, 98, 78],
+      [4, 49, 31],
+      [2, 32, 14, 4, 33, 15],
+      [4, 39, 13, 1, 40, 14],
+
+      // 8
+      [2, 121, 97],
+      [2, 60, 38, 2, 61, 39],
+      [4, 40, 18, 2, 41, 19],
+      [4, 40, 14, 2, 41, 15],
+
+      // 9
+      [2, 146, 116],
+      [3, 58, 36, 2, 59, 37],
+      [4, 36, 16, 4, 37, 17],
+      [4, 36, 12, 4, 37, 13],
+
+      // 10
+      [2, 86, 68, 2, 87, 69],
+      [4, 69, 43, 1, 70, 44],
+      [6, 43, 19, 2, 44, 20],
+      [6, 43, 15, 2, 44, 16],
+
+      // 11
+      [4, 101, 81],
+      [1, 80, 50, 4, 81, 51],
+      [4, 50, 22, 4, 51, 23],
+      [3, 36, 12, 8, 37, 13],
+
+      // 12
+      [2, 116, 92, 2, 117, 93],
+      [6, 58, 36, 2, 59, 37],
+      [4, 46, 20, 6, 47, 21],
+      [7, 42, 14, 4, 43, 15],
+
+      // 13
+      [4, 133, 107],
+      [8, 59, 37, 1, 60, 38],
+      [8, 44, 20, 4, 45, 21],
+      [12, 33, 11, 4, 34, 12],
+
+      // 14
+      [3, 145, 115, 1, 146, 116],
+      [4, 64, 40, 5, 65, 41],
+      [11, 36, 16, 5, 37, 17],
+      [11, 36, 12, 5, 37, 13],
+
+      // 15
+      [5, 109, 87, 1, 110, 88],
+      [5, 65, 41, 5, 66, 42],
+      [5, 54, 24, 7, 55, 25],
+      [11, 36, 12, 7, 37, 13],
+
+      // 16
+      [5, 122, 98, 1, 123, 99],
+      [7, 73, 45, 3, 74, 46],
+      [15, 43, 19, 2, 44, 20],
+      [3, 45, 15, 13, 46, 16],
+
+      // 17
+      [1, 135, 107, 5, 136, 108],
+      [10, 74, 46, 1, 75, 47],
+      [1, 50, 22, 15, 51, 23],
+      [2, 42, 14, 17, 43, 15],
+
+      // 18
+      [5, 150, 120, 1, 151, 121],
+      [9, 69, 43, 4, 70, 44],
+      [17, 50, 22, 1, 51, 23],
+      [2, 42, 14, 19, 43, 15],
+
+      // 19
+      [3, 141, 113, 4, 142, 114],
+      [3, 70, 44, 11, 71, 45],
+      [17, 47, 21, 4, 48, 22],
+      [9, 39, 13, 16, 40, 14],
+
+      // 20
+      [3, 135, 107, 5, 136, 108],
+      [3, 67, 41, 13, 68, 42],
+      [15, 54, 24, 5, 55, 25],
+      [15, 43, 15, 10, 44, 16],
+
+      // 21
+      [4, 144, 116, 4, 145, 117],
+      [17, 68, 42],
+      [17, 50, 22, 6, 51, 23],
+      [19, 46, 16, 6, 47, 17],
+
+      // 22
+      [2, 139, 111, 7, 140, 112],
+      [17, 74, 46],
+      [7, 54, 24, 16, 55, 25],
+      [34, 37, 13],
+
+      // 23
+      [4, 151, 121, 5, 152, 122],
+      [4, 75, 47, 14, 76, 48],
+      [11, 54, 24, 14, 55, 25],
+      [16, 45, 15, 14, 46, 16],
+
+      // 24
+      [6, 147, 117, 4, 148, 118],
+      [6, 73, 45, 14, 74, 46],
+      [11, 54, 24, 16, 55, 25],
+      [30, 46, 16, 2, 47, 17],
+
+      // 25
+      [8, 132, 106, 4, 133, 107],
+      [8, 75, 47, 13, 76, 48],
+      [7, 54, 24, 22, 55, 25],
+      [22, 45, 15, 13, 46, 16],
+
+      // 26
+      [10, 142, 114, 2, 143, 115],
+      [19, 74, 46, 4, 75, 47],
+      [28, 50, 22, 6, 51, 23],
+      [33, 46, 16, 4, 47, 17],
+
+      // 27
+      [8, 152, 122, 4, 153, 123],
+      [22, 73, 45, 3, 74, 46],
+      [8, 53, 23, 26, 54, 24],
+      [12, 45, 15, 28, 46, 16],
+
+      // 28
+      [3, 147, 117, 10, 148, 118],
+      [3, 73, 45, 23, 74, 46],
+      [4, 54, 24, 31, 55, 25],
+      [11, 45, 15, 31, 46, 16],
+
+      // 29
+      [7, 146, 116, 7, 147, 117],
+      [21, 73, 45, 7, 74, 46],
+      [1, 53, 23, 37, 54, 24],
+      [19, 45, 15, 26, 46, 16],
+
+      // 30
+      [5, 145, 115, 10, 146, 116],
+      [19, 75, 47, 10, 76, 48],
+      [15, 54, 24, 25, 55, 25],
+      [23, 45, 15, 25, 46, 16],
+
+      // 31
+      [13, 145, 115, 3, 146, 116],
+      [2, 74, 46, 29, 75, 47],
+      [42, 54, 24, 1, 55, 25],
+      [23, 45, 15, 28, 46, 16],
+
+      // 32
+      [17, 145, 115],
+      [10, 74, 46, 23, 75, 47],
+      [10, 54, 24, 35, 55, 25],
+      [19, 45, 15, 35, 46, 16],
+
+      // 33
+      [17, 145, 115, 1, 146, 116],
+      [14, 74, 46, 21, 75, 47],
+      [29, 54, 24, 19, 55, 25],
+      [11, 45, 15, 46, 46, 16],
+
+      // 34
+      [13, 145, 115, 6, 146, 116],
+      [14, 74, 46, 23, 75, 47],
+      [44, 54, 24, 7, 55, 25],
+      [59, 46, 16, 1, 47, 17],
+
+      // 35
+      [12, 151, 121, 7, 152, 122],
+      [12, 75, 47, 26, 76, 48],
+      [39, 54, 24, 14, 55, 25],
+      [22, 45, 15, 41, 46, 16],
+
+      // 36
+      [6, 151, 121, 14, 152, 122],
+      [6, 75, 47, 34, 76, 48],
+      [46, 54, 24, 10, 55, 25],
+      [2, 45, 15, 64, 46, 16],
+
+      // 37
+      [17, 152, 122, 4, 153, 123],
+      [29, 74, 46, 14, 75, 47],
+      [49, 54, 24, 10, 55, 25],
+      [24, 45, 15, 46, 46, 16],
+
+      // 38
+      [4, 152, 122, 18, 153, 123],
+      [13, 74, 46, 32, 75, 47],
+      [48, 54, 24, 14, 55, 25],
+      [42, 45, 15, 32, 46, 16],
+
+      // 39
+      [20, 147, 117, 4, 148, 118],
+      [40, 75, 47, 7, 76, 48],
+      [43, 54, 24, 22, 55, 25],
+      [10, 45, 15, 67, 46, 16],
+
+      // 40
+      [19, 148, 118, 6, 149, 119],
+      [18, 75, 47, 31, 76, 48],
+      [34, 54, 24, 34, 55, 25],
+      [20, 45, 15, 61, 46, 16]
+    ];
+
+    var qrRSBlock = function(totalCount, dataCount) {
+      var _this = {};
+      _this.totalCount = totalCount;
+      _this.dataCount = dataCount;
+      return _this;
+    };
+
+    var _this = {};
+
+    var getRsBlockTable = function(typeNumber, errorCorrectionLevel) {
+
+      switch(errorCorrectionLevel) {
+      case QRErrorCorrectionLevel.L :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+      case QRErrorCorrectionLevel.M :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+      case QRErrorCorrectionLevel.Q :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+      case QRErrorCorrectionLevel.H :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+      default :
+        return undefined;
+      }
+    };
+
+    _this.getRSBlocks = function(typeNumber, errorCorrectionLevel) {
+
+      var rsBlock = getRsBlockTable(typeNumber, errorCorrectionLevel);
+
+      if (typeof rsBlock == 'undefined') {
+        throw 'bad rs block @ typeNumber:' + typeNumber +
+            '/errorCorrectionLevel:' + errorCorrectionLevel;
+      }
+
+      var length = rsBlock.length / 3;
+
+      var list = [];
+
+      for (var i = 0; i < length; i += 1) {
+
+        var count = rsBlock[i * 3 + 0];
+        var totalCount = rsBlock[i * 3 + 1];
+        var dataCount = rsBlock[i * 3 + 2];
+
+        for (var j = 0; j < count; j += 1) {
+          list.push(qrRSBlock(totalCount, dataCount) );
+        }
+      }
+
+      return list;
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // qrBitBuffer
+  //---------------------------------------------------------------------
+
+  var qrBitBuffer = function() {
+
+    var _buffer = [];
+    var _length = 0;
+
+    var _this = {};
+
+    _this.getBuffer = function() {
+      return _buffer;
+    };
+
+    _this.getAt = function(index) {
+      var bufIndex = Math.floor(index / 8);
+      return ( (_buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
+    };
+
+    _this.put = function(num, length) {
+      for (var i = 0; i < length; i += 1) {
+        _this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
+      }
+    };
+
+    _this.getLengthInBits = function() {
+      return _length;
+    };
+
+    _this.putBit = function(bit) {
+
+      var bufIndex = Math.floor(_length / 8);
+      if (_buffer.length <= bufIndex) {
+        _buffer.push(0);
+      }
+
+      if (bit) {
+        _buffer[bufIndex] |= (0x80 >>> (_length % 8) );
+      }
+
+      _length += 1;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrNumber
+  //---------------------------------------------------------------------
+
+  var qrNumber = function(data) {
+
+    var _mode = QRMode.MODE_NUMBER;
+    var _data = data;
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _data.length;
+    };
+
+    _this.write = function(buffer) {
+
+      var data = _data;
+
+      var i = 0;
+
+      while (i + 2 < data.length) {
+        buffer.put(strToNum(data.substring(i, i + 3) ), 10);
+        i += 3;
+      }
+
+      if (i < data.length) {
+        if (data.length - i == 1) {
+          buffer.put(strToNum(data.substring(i, i + 1) ), 4);
+        } else if (data.length - i == 2) {
+          buffer.put(strToNum(data.substring(i, i + 2) ), 7);
+        }
+      }
+    };
+
+    var strToNum = function(s) {
+      var num = 0;
+      for (var i = 0; i < s.length; i += 1) {
+        num = num * 10 + chatToNum(s.charAt(i) );
+      }
+      return num;
+    };
+
+    var chatToNum = function(c) {
+      if ('0' <= c && c <= '9') {
+        return c.charCodeAt(0) - '0'.charCodeAt(0);
+      }
+      throw 'illegal char :' + c;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrAlphaNum
+  //---------------------------------------------------------------------
+
+  var qrAlphaNum = function(data) {
+
+    var _mode = QRMode.MODE_ALPHA_NUM;
+    var _data = data;
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _data.length;
+    };
+
+    _this.write = function(buffer) {
+
+      var s = _data;
+
+      var i = 0;
+
+      while (i + 1 < s.length) {
+        buffer.put(
+          getCode(s.charAt(i) ) * 45 +
+          getCode(s.charAt(i + 1) ), 11);
+        i += 2;
+      }
+
+      if (i < s.length) {
+        buffer.put(getCode(s.charAt(i) ), 6);
+      }
+    };
+
+    var getCode = function(c) {
+
+      if ('0' <= c && c <= '9') {
+        return c.charCodeAt(0) - '0'.charCodeAt(0);
+      } else if ('A' <= c && c <= 'Z') {
+        return c.charCodeAt(0) - 'A'.charCodeAt(0) + 10;
+      } else {
+        switch (c) {
+        case ' ' : return 36;
+        case '$' : return 37;
+        case '%' : return 38;
+        case '*' : return 39;
+        case '+' : return 40;
+        case '-' : return 41;
+        case '.' : return 42;
+        case '/' : return 43;
+        case ':' : return 44;
+        default :
+          throw 'illegal char :' + c;
+        }
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qr8BitByte
+  //---------------------------------------------------------------------
+
+  var qr8BitByte = function(data) {
+
+    var _mode = QRMode.MODE_8BIT_BYTE;
+    var _data = data;
+    var _bytes = qrcode.stringToBytes(data);
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _bytes.length;
+    };
+
+    _this.write = function(buffer) {
+      for (var i = 0; i < _bytes.length; i += 1) {
+        buffer.put(_bytes[i], 8);
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrKanji
+  //---------------------------------------------------------------------
+
+  var qrKanji = function(data) {
+
+    var _mode = QRMode.MODE_KANJI;
+    var _data = data;
+
+    var stringToBytes = qrcode.stringToBytesFuncs['SJIS'];
+    if (!stringToBytes) {
+      throw 'sjis not supported.';
+    }
+    !function(c, code) {
+      // self test for sjis support.
+      var test = stringToBytes(c);
+      if (test.length != 2 || ( (test[0] << 8) | test[1]) != code) {
+        throw 'sjis not supported.';
+      }
+    }('\u53cb', 0x9746);
+
+    var _bytes = stringToBytes(data);
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return ~~(_bytes.length / 2);
+    };
+
+    _this.write = function(buffer) {
+
+      var data = _bytes;
+
+      var i = 0;
+
+      while (i + 1 < data.length) {
+
+        var c = ( (0xff & data[i]) << 8) | (0xff & data[i + 1]);
+
+        if (0x8140 <= c && c <= 0x9FFC) {
+          c -= 0x8140;
+        } else if (0xE040 <= c && c <= 0xEBBF) {
+          c -= 0xC140;
+        } else {
+          throw 'illegal char at ' + (i + 1) + '/' + c;
+        }
+
+        c = ( (c >>> 8) & 0xff) * 0xC0 + (c & 0xff);
+
+        buffer.put(c, 13);
+
+        i += 2;
+      }
+
+      if (i < data.length) {
+        throw 'illegal char at ' + (i + 1);
+      }
+    };
+
+    return _this;
+  };
+
+  //=====================================================================
+  // GIF Support etc.
+  //
+
+  //---------------------------------------------------------------------
+  // byteArrayOutputStream
+  //---------------------------------------------------------------------
+
+  var byteArrayOutputStream = function() {
+
+    var _bytes = [];
+
+    var _this = {};
+
+    _this.writeByte = function(b) {
+      _bytes.push(b & 0xff);
+    };
+
+    _this.writeShort = function(i) {
+      _this.writeByte(i);
+      _this.writeByte(i >>> 8);
+    };
+
+    _this.writeBytes = function(b, off, len) {
+      off = off || 0;
+      len = len || b.length;
+      for (var i = 0; i < len; i += 1) {
+        _this.writeByte(b[i + off]);
+      }
+    };
+
+    _this.writeString = function(s) {
+      for (var i = 0; i < s.length; i += 1) {
+        _this.writeByte(s.charCodeAt(i) );
+      }
+    };
+
+    _this.toByteArray = function() {
+      return _bytes;
+    };
+
+    _this.toString = function() {
+      var s = '';
+      s += '[';
+      for (var i = 0; i < _bytes.length; i += 1) {
+        if (i > 0) {
+          s += ',';
+        }
+        s += _bytes[i];
+      }
+      s += ']';
+      return s;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // base64EncodeOutputStream
+  //---------------------------------------------------------------------
+
+  var base64EncodeOutputStream = function() {
+
+    var _buffer = 0;
+    var _buflen = 0;
+    var _length = 0;
+    var _base64 = '';
+
+    var _this = {};
+
+    var writeEncoded = function(b) {
+      _base64 += String.fromCharCode(encode(b & 0x3f) );
+    };
+
+    var encode = function(n) {
+      if (n < 0) {
+        // error.
+      } else if (n < 26) {
+        return 0x41 + n;
+      } else if (n < 52) {
+        return 0x61 + (n - 26);
+      } else if (n < 62) {
+        return 0x30 + (n - 52);
+      } else if (n == 62) {
+        return 0x2b;
+      } else if (n == 63) {
+        return 0x2f;
+      }
+      throw 'n:' + n;
+    };
+
+    _this.writeByte = function(n) {
+
+      _buffer = (_buffer << 8) | (n & 0xff);
+      _buflen += 8;
+      _length += 1;
+
+      while (_buflen >= 6) {
+        writeEncoded(_buffer >>> (_buflen - 6) );
+        _buflen -= 6;
+      }
+    };
+
+    _this.flush = function() {
+
+      if (_buflen > 0) {
+        writeEncoded(_buffer << (6 - _buflen) );
+        _buffer = 0;
+        _buflen = 0;
+      }
+
+      if (_length % 3 != 0) {
+        // padding
+        var padlen = 3 - _length % 3;
+        for (var i = 0; i < padlen; i += 1) {
+          _base64 += '=';
+        }
+      }
+    };
+
+    _this.toString = function() {
+      return _base64;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // base64DecodeInputStream
+  //---------------------------------------------------------------------
+
+  var base64DecodeInputStream = function(str) {
+
+    var _str = str;
+    var _pos = 0;
+    var _buffer = 0;
+    var _buflen = 0;
+
+    var _this = {};
+
+    _this.read = function() {
+
+      while (_buflen < 8) {
+
+        if (_pos >= _str.length) {
+          if (_buflen == 0) {
+            return -1;
+          }
+          throw 'unexpected end of file./' + _buflen;
+        }
+
+        var c = _str.charAt(_pos);
+        _pos += 1;
+
+        if (c == '=') {
+          _buflen = 0;
+          return -1;
+        } else if (c.match(/^\s$/) ) {
+          // ignore if whitespace.
+          continue;
+        }
+
+        _buffer = (_buffer << 6) | decode(c.charCodeAt(0) );
+        _buflen += 6;
+      }
+
+      var n = (_buffer >>> (_buflen - 8) ) & 0xff;
+      _buflen -= 8;
+      return n;
+    };
+
+    var decode = function(c) {
+      if (0x41 <= c && c <= 0x5a) {
+        return c - 0x41;
+      } else if (0x61 <= c && c <= 0x7a) {
+        return c - 0x61 + 26;
+      } else if (0x30 <= c && c <= 0x39) {
+        return c - 0x30 + 52;
+      } else if (c == 0x2b) {
+        return 62;
+      } else if (c == 0x2f) {
+        return 63;
+      } else {
+        throw 'c:' + c;
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // gifImage (B/W)
+  //---------------------------------------------------------------------
+
+  var gifImage = function(width, height) {
+
+    var _width = width;
+    var _height = height;
+    var _data = new Array(width * height);
+
+    var _this = {};
+
+    _this.setPixel = function(x, y, pixel) {
+      _data[y * _width + x] = pixel;
+    };
+
+    _this.write = function(out) {
+
+      //---------------------------------
+      // GIF Signature
+
+      out.writeString('GIF87a');
+
+      //---------------------------------
+      // Screen Descriptor
+
+      out.writeShort(_width);
+      out.writeShort(_height);
+
+      out.writeByte(0x80); // 2bit
+      out.writeByte(0);
+      out.writeByte(0);
+
+      //---------------------------------
+      // Global Color Map
+
+      // black
+      out.writeByte(0x00);
+      out.writeByte(0x00);
+      out.writeByte(0x00);
+
+      // white
+      out.writeByte(0xff);
+      out.writeByte(0xff);
+      out.writeByte(0xff);
+
+      //---------------------------------
+      // Image Descriptor
+
+      out.writeString(',');
+      out.writeShort(0);
+      out.writeShort(0);
+      out.writeShort(_width);
+      out.writeShort(_height);
+      out.writeByte(0);
+
+      //---------------------------------
+      // Local Color Map
+
+      //---------------------------------
+      // Raster Data
+
+      var lzwMinCodeSize = 2;
+      var raster = getLZWRaster(lzwMinCodeSize);
+
+      out.writeByte(lzwMinCodeSize);
+
+      var offset = 0;
+
+      while (raster.length - offset > 255) {
+        out.writeByte(255);
+        out.writeBytes(raster, offset, 255);
+        offset += 255;
+      }
+
+      out.writeByte(raster.length - offset);
+      out.writeBytes(raster, offset, raster.length - offset);
+      out.writeByte(0x00);
+
+      //---------------------------------
+      // GIF Terminator
+      out.writeString(';');
+    };
+
+    var bitOutputStream = function(out) {
+
+      var _out = out;
+      var _bitLength = 0;
+      var _bitBuffer = 0;
+
+      var _this = {};
+
+      _this.write = function(data, length) {
+
+        if ( (data >>> length) != 0) {
+          throw 'length over';
+        }
+
+        while (_bitLength + length >= 8) {
+          _out.writeByte(0xff & ( (data << _bitLength) | _bitBuffer) );
+          length -= (8 - _bitLength);
+          data >>>= (8 - _bitLength);
+          _bitBuffer = 0;
+          _bitLength = 0;
+        }
+
+        _bitBuffer = (data << _bitLength) | _bitBuffer;
+        _bitLength = _bitLength + length;
+      };
+
+      _this.flush = function() {
+        if (_bitLength > 0) {
+          _out.writeByte(_bitBuffer);
+        }
+      };
+
+      return _this;
+    };
+
+    var getLZWRaster = function(lzwMinCodeSize) {
+
+      var clearCode = 1 << lzwMinCodeSize;
+      var endCode = (1 << lzwMinCodeSize) + 1;
+      var bitLength = lzwMinCodeSize + 1;
+
+      // Setup LZWTable
+      var table = lzwTable();
+
+      for (var i = 0; i < clearCode; i += 1) {
+        table.add(String.fromCharCode(i) );
+      }
+      table.add(String.fromCharCode(clearCode) );
+      table.add(String.fromCharCode(endCode) );
+
+      var byteOut = byteArrayOutputStream();
+      var bitOut = bitOutputStream(byteOut);
+
+      // clear code
+      bitOut.write(clearCode, bitLength);
+
+      var dataIndex = 0;
+
+      var s = String.fromCharCode(_data[dataIndex]);
+      dataIndex += 1;
+
+      while (dataIndex < _data.length) {
+
+        var c = String.fromCharCode(_data[dataIndex]);
+        dataIndex += 1;
+
+        if (table.contains(s + c) ) {
+
+          s = s + c;
+
+        } else {
+
+          bitOut.write(table.indexOf(s), bitLength);
+
+          if (table.size() < 0xfff) {
+
+            if (table.size() == (1 << bitLength) ) {
+              bitLength += 1;
+            }
+
+            table.add(s + c);
+          }
+
+          s = c;
+        }
+      }
+
+      bitOut.write(table.indexOf(s), bitLength);
+
+      // end code
+      bitOut.write(endCode, bitLength);
+
+      bitOut.flush();
+
+      return byteOut.toByteArray();
+    };
+
+    var lzwTable = function() {
+
+      var _map = {};
+      var _size = 0;
+
+      var _this = {};
+
+      _this.add = function(key) {
+        if (_this.contains(key) ) {
+          throw 'dup key:' + key;
+        }
+        _map[key] = _size;
+        _size += 1;
+      };
+
+      _this.size = function() {
+        return _size;
+      };
+
+      _this.indexOf = function(key) {
+        return _map[key];
+      };
+
+      _this.contains = function(key) {
+        return typeof _map[key] != 'undefined';
+      };
+
+      return _this;
+    };
+
+    return _this;
+  };
+
+  var createDataURL = function(width, height, getPixel) {
+    var gif = gifImage(width, height);
+    for (var y = 0; y < height; y += 1) {
+      for (var x = 0; x < width; x += 1) {
+        gif.setPixel(x, y, getPixel(x, y) );
+      }
+    }
+
+    var b = byteArrayOutputStream();
+    gif.write(b);
+
+    var base64 = base64EncodeOutputStream();
+    var bytes = b.toByteArray();
+    for (var i = 0; i < bytes.length; i += 1) {
+      base64.writeByte(bytes[i]);
+    }
+    base64.flush();
+
+    return 'data:image/gif;base64,' + base64;
+  };
+
+  //---------------------------------------------------------------------
+  // returns qrcode function.
+
+  return qrcode;
+}();
+
+// multibyte support
+!function() {
+
+  qrcode.stringToBytesFuncs['UTF-8'] = function(s) {
+    // http://stackoverflow.com/questions/18729405/how-to-convert-utf8-string-to-byte-array
+    function toUTF8Array(str) {
+      var utf8 = [];
+      for (var i=0; i < str.length; i++) {
+        var charcode = str.charCodeAt(i);
+        if (charcode < 0x80) utf8.push(charcode);
+        else if (charcode < 0x800) {
+          utf8.push(0xc0 | (charcode >> 6),
+              0x80 | (charcode & 0x3f));
+        }
+        else if (charcode < 0xd800 || charcode >= 0xe000) {
+          utf8.push(0xe0 | (charcode >> 12),
+              0x80 | ((charcode>>6) & 0x3f),
+              0x80 | (charcode & 0x3f));
+        }
+        // surrogate pair
+        else {
+          i++;
+          // UTF-16 encodes 0x10000-0x10FFFF by
+          // subtracting 0x10000 and splitting the
+          // 20 bits of 0x0-0xFFFFF into two halves
+          charcode = 0x10000 + (((charcode & 0x3ff)<<10)
+            | (str.charCodeAt(i) & 0x3ff));
+          utf8.push(0xf0 | (charcode >>18),
+              0x80 | ((charcode>>12) & 0x3f),
+              0x80 | ((charcode>>6) & 0x3f),
+              0x80 | (charcode & 0x3f));
+        }
+      }
+      return utf8;
+    }
+    return toUTF8Array(s);
+  };
+
+}();
+
+(function (factory) {
+  if (typeof define === 'function' && define.amd) {
+      define([], factory);
+  } else if (typeof exports === 'object') {
+      module.exports = factory();
+  }
+}(function () {
+    return qrcode;
+}));
+
+// Use UTF-8 byte encoding so non-ASCII (e.g. Persian) config names embedded
+// in the vless '#name' fragment or vmess remark are captured correctly.
+qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
+</script>
+
 
 <!-- ═══════════════════════════════════════════════ -->
 <!--  JAVASCRIPT                                    -->
@@ -895,6 +3471,204 @@ const CF_DATA = {
     // 197.234 range
     '197.234.240.1','197.234.241.1','197.234.242.1',
   ],
+
+  // ══════════════════════════════════════════════════════════════════
+  // ➕ بخش‌های زیر صرفاً «اضافه‌شده» هستند — هیچ‌کدام از داده‌های بالا
+  //    (official_v4 / official_v6 / warp / clean_subnets / popular_ips)
+  //    تغییر یا حذف نشده‌اند.
+  // ══════════════════════════════════════════════════════════════════
+
+  // Cloudflare — زیرشبکه‌های Clean تکمیلی (همگی داخل رنج‌های رسمی بالا)
+  clean_subnets_extra: [
+    { v:'103.21.244.0/24',  d:'Clean subnet — Asia Pacific' },
+    { v:'103.22.200.0/24',  d:'Clean subnet — Asia Pacific' },
+    { v:'103.31.4.0/24',    d:'Clean subnet — Asia Pacific' },
+    { v:'131.0.72.0/24',    d:'Clean subnet — Core' },
+    { v:'131.0.73.0/24',    d:'Clean subnet — Core' },
+    { v:'141.101.64.0/24',  d:'Clean subnet — Europe' },
+    { v:'141.101.100.0/24', d:'Clean subnet — Europe' },
+    { v:'172.67.0.0/24',    d:'Clean subnet' },
+    { v:'172.68.0.0/24',    d:'Clean subnet' },
+    { v:'172.69.0.0/24',    d:'Clean subnet' },
+    { v:'172.70.0.0/24',    d:'Clean subnet' },
+    { v:'172.71.0.0/24',    d:'Clean subnet' },
+    { v:'173.245.48.0/24',  d:'Clean subnet — US' },
+    { v:'173.245.60.0/24',  d:'Clean subnet — US' },
+    { v:'188.114.100.0/24', d:'Clean subnet — Europe' },
+    { v:'190.93.240.0/24',  d:'Clean subnet — Latin America' },
+    { v:'190.93.250.0/24',  d:'Clean subnet — Latin America' },
+    { v:'197.234.240.0/24', d:'Clean subnet — Africa' },
+    { v:'197.234.242.0/24', d:'Clean subnet — Africa' },
+    { v:'108.162.192.0/24', d:'Clean subnet — US East' },
+    { v:'108.162.220.0/24', d:'Clean subnet — US East' },
+    { v:'198.41.128.0/24',  d:'Clean subnet — US' },
+    { v:'198.41.211.0/24',  d:'Clean subnet — US' },
+  ],
+
+  // Cloudflare — آی‌پی‌های محبوب تکمیلی (همگی داخل رنج‌های رسمی بالا)
+  popular_ips_extra: [
+    { v:'104.16.6.2',    d:'IP تکمیلی — 104.16.x' },
+    { v:'104.16.12.5',   d:'IP تکمیلی — 104.16.x' },
+    { v:'104.16.20.9',   d:'IP تکمیلی — 104.16.x' },
+    { v:'104.16.40.15',  d:'IP تکمیلی — 104.16.x' },
+    { v:'104.16.80.20',  d:'IP تکمیلی — 104.16.x' },
+    { v:'104.16.160.25', d:'IP تکمیلی — 104.16.x' },
+    { v:'104.17.32.7',   d:'IP تکمیلی — 104.17.x' },
+    { v:'104.17.160.30', d:'IP تکمیلی — 104.17.x' },
+    { v:'104.17.200.45', d:'IP تکمیلی — 104.17.x' },
+    { v:'104.18.50.10',  d:'IP تکمیلی — 104.18.x' },
+    { v:'104.18.150.60', d:'IP تکمیلی — 104.18.x' },
+    { v:'104.19.20.15',  d:'IP تکمیلی — 104.19.x' },
+    { v:'104.19.100.80', d:'IP تکمیلی — 104.19.x' },
+    { v:'104.20.30.12',  d:'IP تکمیلی — 104.20.x' },
+    { v:'104.20.150.90', d:'IP تکمیلی — 104.20.x' },
+    { v:'104.21.40.18',  d:'IP تکمیلی — 104.21.x' },
+    { v:'104.21.180.95', d:'IP تکمیلی — 104.21.x' },
+    { v:'104.22.60.22',  d:'IP تکمیلی — 104.22.x' },
+    { v:'104.22.190.100',d:'IP تکمیلی — 104.22.x' },
+    { v:'104.23.50.11',  d:'IP تکمیلی — 104.23.x' },
+    { v:'104.24.60.13',  d:'IP تکمیلی — 104.24.x' },
+    { v:'104.25.70.14',  d:'IP تکمیلی — 104.25.x' },
+    { v:'104.26.80.16',  d:'IP تکمیلی — 104.26.x' },
+    { v:'104.27.90.17',  d:'IP تکمیلی — 104.27.x' },
+    { v:'172.64.10.9',   d:'IP تکمیلی — 172.64.x' },
+    { v:'172.65.20.11',  d:'IP تکمیلی — 172.65.x' },
+    { v:'172.66.30.13',  d:'IP تکمیلی — 172.66.x' },
+    { v:'172.67.40.15',  d:'IP تکمیلی — 172.67.x' },
+    { v:'172.68.50.17',  d:'IP تکمیلی — 172.68.x' },
+    { v:'172.69.60.19',  d:'IP تکمیلی — 172.69.x' },
+    { v:'172.70.70.21',  d:'IP تکمیلی — 172.70.x' },
+    { v:'172.71.80.23',  d:'IP تکمیلی — 172.71.x' },
+    { v:'162.159.61.5',   d:'IP تکمیلی — 162.159.x' },
+    { v:'162.159.135.42', d:'IP تکمیلی — 162.159.x' },
+    { v:'162.159.208.77', d:'IP تکمیلی — 162.159.x' },
+    { v:'162.158.50.8',  d:'IP تکمیلی — 162.158.x' },
+    { v:'162.158.200.60',d:'IP تکمیلی — 162.158.x' },
+    { v:'141.101.90.5',  d:'IP تکمیلی — 141.101.x' },
+    { v:'141.101.110.8', d:'IP تکمیلی — 141.101.x' },
+    { v:'108.162.195.4', d:'IP تکمیلی — 108.162.x' },
+    { v:'108.162.225.9', d:'IP تکمیلی — 108.162.x' },
+    { v:'173.245.52.3',  d:'IP تکمیلی — 173.245.x' },
+    { v:'173.245.62.6',  d:'IP تکمیلی — 173.245.x' },
+    { v:'188.114.100.2', d:'IP تکمیلی — 188.114.x' },
+    { v:'188.114.110.4', d:'IP تکمیلی — 188.114.x' },
+    { v:'190.93.248.3',  d:'IP تکمیلی — 190.93.x' },
+    { v:'190.93.252.5',  d:'IP تکمیلی — 190.93.x' },
+    { v:'198.41.150.2',  d:'IP تکمیلی — 198.41.x' },
+    { v:'198.41.240.6',  d:'IP تکمیلی — 198.41.x' },
+    { v:'103.21.246.2',  d:'IP تکمیلی — 103.21.x' },
+    { v:'103.22.202.3',  d:'IP تکمیلی — 103.22.x' },
+    { v:'103.31.6.4',    d:'IP تکمیلی — 103.31.x' },
+    { v:'131.0.74.2',    d:'IP تکمیلی — 131.0.x' },
+    { v:'131.0.75.3',    d:'IP تکمیلی — 131.0.x' },
+    { v:'197.234.243.2', d:'IP تکمیلی — 197.234.x' },
+  ],
+
+  // Fastly — رنج‌های رسمی IPv4 (منبع: api.fastly.com/public-ip-list)
+  fastly_v4: [
+    { v:'23.235.32.0/20',   d:'Fastly — Global anycast' },
+    { v:'43.249.72.0/22',   d:'Fastly — Global anycast' },
+    { v:'103.244.50.0/24',  d:'Fastly — Global anycast' },
+    { v:'103.245.222.0/23', d:'Fastly — Global anycast' },
+    { v:'103.245.224.0/24', d:'Fastly — Global anycast' },
+    { v:'104.156.80.0/20',  d:'Fastly — Global anycast' },
+    { v:'140.248.64.0/18',  d:'Fastly — Global anycast' },
+    { v:'140.248.128.0/17', d:'Fastly — Global anycast' },
+    { v:'146.75.0.0/17',    d:'Fastly — Global anycast' },
+    { v:'151.101.0.0/16',   d:'Fastly — پرکاربردترین رنج' },
+    { v:'157.52.64.0/18',   d:'Fastly — Global anycast' },
+    { v:'167.82.0.0/17',    d:'Fastly — Global anycast' },
+    { v:'167.82.128.0/20',  d:'Fastly — Global anycast' },
+    { v:'167.82.160.0/20',  d:'Fastly — Global anycast' },
+    { v:'167.82.224.0/20',  d:'Fastly — Global anycast' },
+    { v:'172.111.64.0/18',  d:'Fastly — Global anycast' },
+    { v:'185.31.16.0/22',   d:'Fastly — Global anycast' },
+    { v:'199.27.72.0/21',   d:'Fastly — Global anycast' },
+    { v:'199.232.0.0/16',   d:'Fastly — Global anycast' },
+  ],
+
+  // Fastly — رنج‌های رسمی IPv6
+  fastly_v6: [
+    { v:'2a04:4e40::/32', d:'Fastly IPv6 — Global anycast' },
+    { v:'2a04:4e42::/32', d:'Fastly IPv6 — Global anycast' },
+  ],
+
+  // Amazon CloudFront — زیرمجموعه‌ی منتخب از رنج‌های رسمی
+  // منبع: d7uri8nf7uskq.cloudfront.net/tools/list-cloudfront-ips (ابزار رسمی AWS)
+  cloudfront_v4: [
+    { v:'205.251.208.0/20', d:'CloudFront edge' },
+    { v:'204.246.168.0/22', d:'CloudFront edge' },
+    { v:'18.160.0.0/15',    d:'CloudFront edge — US' },
+    { v:'54.192.0.0/16',    d:'CloudFront edge — US' },
+    { v:'130.176.0.0/17',   d:'CloudFront edge' },
+    { v:'108.156.0.0/14',   d:'CloudFront edge' },
+    { v:'99.86.0.0/16',     d:'CloudFront edge' },
+    { v:'13.32.0.0/15',     d:'CloudFront edge' },
+    { v:'13.224.0.0/14',    d:'CloudFront edge' },
+    { v:'15.158.0.0/16',    d:'CloudFront edge' },
+    { v:'13.249.0.0/16',    d:'CloudFront edge' },
+    { v:'18.238.0.0/15',    d:'CloudFront edge' },
+    { v:'18.244.0.0/15',    d:'CloudFront edge' },
+    { v:'3.165.0.0/16',     d:'CloudFront edge' },
+    { v:'3.168.0.0/14',     d:'CloudFront edge' },
+    { v:'65.9.128.0/18',    d:'CloudFront edge' },
+    { v:'205.251.206.0/23', d:'CloudFront edge' },
+    { v:'54.230.208.0/20',  d:'CloudFront edge' },
+    { v:'3.160.0.0/14',     d:'CloudFront edge' },
+    { v:'52.222.128.0/17',  d:'CloudFront edge' },
+    { v:'18.164.0.0/15',    d:'CloudFront edge' },
+    { v:'64.252.128.0/18',  d:'CloudFront edge' },
+    { v:'71.152.0.0/17',    d:'CloudFront edge' },
+    { v:'216.137.32.0/19',  d:'CloudFront edge — کلاسیک' },
+  ],
+
+  // Google Cloud — رنج‌های Global (Load Balancer / Cloud CDN anycast)
+  // منبع: gstatic.com/ipranges/cloud.json — scope:"global" (لیست رسمی گوگل)
+  google_v4: [
+    { v:'8.228.224.0/20',   d:'Google Cloud — Global LB/CDN' },
+    { v:'8.232.0.0/15',     d:'Google Cloud — Global LB/CDN' },
+    { v:'34.8.0.0/16',      d:'Google Cloud — Global LB/CDN' },
+    { v:'34.13.72.0/21',    d:'Google Cloud — Global LB/CDN' },
+    { v:'34.13.112.0/20',   d:'Google Cloud — Global LB/CDN' },
+    { v:'34.36.0.0/16',     d:'Google Cloud — Global LB/CDN' },
+    { v:'34.49.0.0/16',     d:'Google Cloud — Global LB/CDN' },
+    { v:'34.50.144.0/20',   d:'Google Cloud — Global LB/CDN' },
+    { v:'34.54.0.0/16',     d:'Google Cloud — Global LB/CDN' },
+    { v:'34.95.64.0/18',    d:'Google Cloud — Global LB/CDN' },
+    { v:'34.96.64.0/18',    d:'Google Cloud — Global LB/CDN' },
+    { v:'34.98.64.0/18',    d:'Google Cloud — Global LB/CDN' },
+    { v:'34.102.128.0/17',  d:'Google Cloud — Global LB/CDN' },
+    { v:'34.104.27.0/24',   d:'Google Cloud — Global LB/CDN' },
+    { v:'34.107.128.0/17',  d:'Google Cloud — Global LB/CDN' },
+    { v:'34.110.128.0/17',  d:'Google Cloud — Global LB/CDN' },
+    { v:'34.111.0.0/16',    d:'Google Cloud — Global LB/CDN' },
+    { v:'34.116.0.0/21',    d:'Google Cloud — Global LB/CDN' },
+    { v:'34.117.0.0/16',    d:'Google Cloud — Global LB/CDN' },
+    { v:'34.120.0.0/16',    d:'Google Cloud — Global LB/CDN' },
+    { v:'34.128.128.0/18',  d:'Google Cloud — Global LB/CDN' },
+    { v:'34.144.192.0/18',  d:'Google Cloud — Global LB/CDN' },
+    { v:'34.149.0.0/16',    d:'Google Cloud — Global LB/CDN' },
+    { v:'34.160.0.0/16',    d:'Google Cloud — Global LB/CDN' },
+    { v:'35.186.192.0/18',  d:'Google Cloud — Global LB/CDN' },
+    { v:'35.190.0.0/18',    d:'Google Cloud — Global LB/CDN' },
+    { v:'35.190.64.0/19',   d:'Google Cloud — Global LB/CDN' },
+    { v:'35.190.112.0/20',  d:'Google Cloud — Global LB/CDN' },
+    { v:'35.201.64.0/18',   d:'Google Cloud — Global LB/CDN' },
+    { v:'35.227.192.0/18',  d:'Google Cloud — Global LB/CDN' },
+    { v:'35.241.0.0/18',    d:'Google Cloud — Global LB/CDN' },
+    { v:'35.244.128.0/17',  d:'Google Cloud — Global LB/CDN' },
+    { v:'107.178.240.0/20', d:'Google Cloud — Global LB/CDN' },
+    { v:'130.211.4.0/22',   d:'Google Cloud — Global LB/CDN' },
+    { v:'130.211.8.0/21',   d:'Google Cloud — Global LB/CDN' },
+    { v:'130.211.16.0/20',  d:'Google Cloud — Global LB/CDN' },
+    { v:'130.211.32.0/20',  d:'Google Cloud — Global LB/CDN' },
+    { v:'136.68.0.0/16',    d:'Google Cloud — Global LB/CDN' },
+    { v:'136.69.0.0/17',    d:'Google Cloud — Global LB/CDN' },
+    { v:'136.79.0.0/17',    d:'Google Cloud — Global LB/CDN' },
+    { v:'136.81.0.0/16',    d:'Google Cloud — Global LB/CDN' },
+    { v:'136.82.0.0/16',    d:'Google Cloud — Global LB/CDN' },
+    { v:'136.110.128.0/17', d:'Google Cloud — Global LB/CDN' },
+  ],
 };
 
 // ── State ──────────────────────────────────────────
@@ -903,6 +3677,26 @@ let GENERATED = [];
 let testResults = [];
 let testAbort = false;
 let editingListId = null;
+
+// ── Theme (Dark / Light) ───────────────────────────
+const THEME_KEY = 'v2ray_theme_v1';
+
+function syncThemeUI() {
+  const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+  const icon  = document.getElementById('themeIcon');
+  const btn   = document.getElementById('themeToggle');
+  if (icon) icon.textContent = theme === 'light' ? '☀️' : '🌙';
+  if (btn)  btn.title = theme === 'light' ? 'رفتن به حالت شب' : 'رفتن به حالت روز';
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem(THEME_KEY, next); } catch {}
+  syncThemeUI();
+  toast(next === 'light' ? 'حالت روز فعال شد ☀️' : 'حالت شب فعال شد 🌙', 'ok');
+}
 
 // ── Tab switching ──────────────────────────────────
 function switchTab(tab) {
@@ -1366,6 +4160,12 @@ function renderMakerRanges() {
     warp:         '🌀 Cloudflare WARP',
     clean_subnets:'✨ زیرشبکه‌های Clean',
     popular_ips:  '⭐ آی‌پی‌های محبوب',
+    // ➕ افزوده‌شده — گروه‌های بالا بدون تغییر باقی ماندند
+    clean_subnets_extra: '✨ زیرشبکه‌های Clean (تکمیلی)',
+    popular_ips_extra:   '⭐ آی‌پی‌های محبوب (تکمیلی)',
+    fastly_v4:           '🚀 Fastly IPv4',
+    cloudfront_v4:       '📦 Amazon CloudFront',
+    google_v4:           '🌍 Google Cloud (LB/CDN)',
   };
 
   let html = '';
@@ -1496,6 +4296,210 @@ function randomSample(arr, n) {
   return a.slice(0, n);
 }
 
+// ─── COUNTRY LOOKUP (for the location-based naming mode) ──
+// Resolves an IP/host to its ISO country code. Results are cached both
+// in-memory and in localStorage, keyed by exact address, so the same
+// address is never looked up twice across generations or page reloads.
+//
+// Only *successful* lookups are cached — a failure is never persisted, so a
+// transient outage (or a single blocked provider) doesn't permanently poison
+// an address; it's simply retried on the next generation.
+const COUNTRY_CACHE_KEY = 'v2ray_country_cache_v1';
+const UNKNOWN_COUNTRY = 'XX';
+
+function loadCountryCache() {
+  try {
+    const entries = Object.entries(JSON.parse(localStorage.getItem(COUNTRY_CACHE_KEY) || '{}'));
+    // Drop any "XX" previously persisted by an older version of this tool
+    // (which cached failures permanently) so those addresses get retried
+    // instead of being stuck as "unknown" forever.
+    return new Map(entries.filter(([, code]) => code !== UNKNOWN_COUNTRY));
+  } catch { return new Map(); }
+}
+const countryCache = loadCountryCache();
+
+function saveCountryCache() {
+  try { localStorage.setItem(COUNTRY_CACHE_KEY, JSON.stringify(Object.fromEntries(countryCache))); }
+  catch {}
+}
+
+// Converts a 2-letter ISO 3166-1 alpha-2 code into its flag emoji using the
+// regional-indicator-symbol trick (each letter → U+1F1E6..U+1F1FF).
+function countryFlagEmoji(code) {
+  if (!/^[A-Z]{2}$/.test(code || '')) return '';
+  return String.fromCodePoint(...[...code].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+}
+
+// Builds the short token appended to config names, e.g. "🇩🇪DE" or "XX" when unknown.
+function countryToken(code) {
+  if (!code || code === UNKNOWN_COUNTRY) return UNKNOWN_COUNTRY;
+  const flag = countryFlagEmoji(code);
+  return flag ? `${flag}${code}` : code;
+}
+
+// Three independent, keyless, HTTPS+CORS providers. A single provider being
+// down/blocked/rate-limited (e.g. a Cloudflare bot-challenge some networks
+// trigger on ipapi.co, especially from a "null" file:// origin) shouldn't
+// mean the whole feature fails — every address races all three at once via
+// fetchCountryCode() below and takes whichever answers first.
+const COUNTRY_PROVIDERS = [
+  {
+    name: 'ipapi.co',
+    url: a => `https://ipapi.co/${encodeURIComponent(a)}/country/`,
+    parse: async res => {
+      const text = (await res.text()).trim().toUpperCase();
+      return /^[A-Z]{2}$/.test(text) ? text : null;
+    },
+  },
+  {
+    name: 'ipwho.is',
+    url: a => `https://ipwho.is/${encodeURIComponent(a)}?fields=success,country_code`,
+    parse: async res => {
+      const data = await res.json();
+      const code = String(data?.success && data.country_code || '').toUpperCase();
+      return /^[A-Z]{2}$/.test(code) ? code : null;
+    },
+  },
+  {
+    name: 'geojs.io',
+    url: a => `https://get.geojs.io/v1/ip/country/${encodeURIComponent(a)}.json`,
+    parse: async res => {
+      const data = await res.json();
+      const code = String(data?.country || '').toUpperCase();
+      return /^[A-Z]{2}$/.test(code) ? code : null;
+    },
+  },
+];
+
+async function tryCountryProvider(provider, address, timeoutMs) {
+  const ctrl = new AbortController();
+  const tid  = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const res = await fetch(provider.url(address), { cache: 'no-store', signal: ctrl.signal });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const code = await provider.parse(res);
+    if (!code) throw new Error('unexpected response body');
+    return code;
+  } finally {
+    clearTimeout(tid);
+  }
+}
+
+async function fetchCountryCode(address) {
+  // Race all providers concurrently (not one-by-one) so a single hanging/
+  // filtered provider costs at most one timeout, not the sum of all three.
+  const attempts = COUNTRY_PROVIDERS.map(provider =>
+    tryCountryProvider(provider, address, 6000).catch(err => {
+      console.warn(`[country-lookup] ${provider.name} failed for "${address}": ${err?.message || err}`);
+      throw err; // re-throw so Promise.any() can fall through to the next provider
+    })
+  );
+  try {
+    return await Promise.any(attempts);
+  } catch {
+    return UNKNOWN_COUNTRY; // every provider failed
+  }
+}
+
+// Resolves country codes for every unique address not already cached, running
+// a small pool of concurrent addresses (mirrors the runQueue() pattern used
+// by the IP tester) so large batches don't fire hundreds of parallel requests.
+// Returns { total, failed } so callers can warn the user when lookups fail.
+async function resolveCountriesForIPs(addresses, onProgress) {
+  const pending = [...new Set(addresses)].filter(a => !countryCache.has(a));
+  const total = pending.length;
+  if (!total) { onProgress?.(0, 0); return { total: 0, failed: 0 }; }
+
+  let idx = 0, done = 0, failed = 0;
+  const concurrency = Math.min(5, total);
+  const worker = async () => {
+    while (idx < pending.length) {
+      const address = pending[idx++];
+      const code = await fetchCountryCode(address);
+      if (code === UNKNOWN_COUNTRY) failed++;
+      else countryCache.set(address, code);
+      done++;
+      onProgress?.(done, total);
+    }
+  };
+  await Promise.all(Array.from({ length: concurrency }, worker));
+  saveCountryCache();
+  return { total, failed };
+}
+
+// ─── CONFIG NAMING MODES ──────────────────────────
+// 'default'                       → نام فعلی کانفیگ، بدون تغییر (رفتار قبلی)
+// 'name_address'                  → {نام} + {جداکننده} + {آدرس}
+// 'name_number_address'           → {نام} + {جداکننده} + {شماره ترتیبی} + {جداکننده} + {آدرس}
+// 'name_number_address_location'  → مثل حالت قبل + {جداکننده} + {کد کشور آدرس} (از طریق ipapi.co)
+function getNamingSettings() {
+  const modeEl     = document.querySelector('input[name="namingMode"]:checked');
+  const mode       = modeEl ? modeEl.value : 'default';
+  const baseRaw    = (document.getElementById('namingBaseName')?.value || '').trim();
+  const baseName   = baseRaw || (PARSED && PARSED.name) || 'Config';
+  const separator  = document.getElementById('namingSeparator')?.value ?? '-';
+  const startRaw   = parseInt(document.getElementById('namingStartNumber')?.value, 10);
+  const startNumber = Number.isNaN(startRaw) ? 1 : startRaw;
+  return { mode, baseName, separator, startNumber };
+}
+
+// index: 0-based position of this config within the generated batch
+// address: the IP/host being assigned to this specific config
+// originalName: the name/remark already embedded in the parsed config (used as-is in default mode)
+function computeConfigName(naming, index, address, originalName) {
+  switch (naming.mode) {
+    case 'name_address':
+      return `${naming.baseName}${naming.separator}${address}`;
+    case 'name_number_address':
+      return `${naming.baseName}${naming.separator}${naming.startNumber + index}${naming.separator}${address}`;
+    case 'name_number_address_location': {
+      const code = countryCache.get(address) || UNKNOWN_COUNTRY;
+      return `${naming.baseName}${naming.separator}${naming.startNumber + index}${naming.separator}${address}${naming.separator}${countryToken(code)}`;
+    }
+    default:
+      return originalName;
+  }
+}
+
+function onNamingModeChange() {
+  const naming    = getNamingSettings();
+  const optionsEl = document.getElementById('namingOptions');
+  const startRow  = document.getElementById('namingStartNumberRow');
+  const locNote   = document.getElementById('namingLocationNote');
+  const needsNumber = naming.mode === 'name_number_address' || naming.mode === 'name_number_address_location';
+  if (optionsEl) optionsEl.classList.toggle('hidden', naming.mode === 'default');
+  if (startRow)  startRow.classList.toggle('hidden', !needsNumber);
+  if (locNote)   locNote.classList.toggle('hidden', naming.mode !== 'name_number_address_location');
+  updateNamingPreview();
+}
+
+function updateNamingPreview() {
+  const previewEl = document.getElementById('namingPreview');
+  if (!previewEl) return;
+  const naming = getNamingSettings();
+  const currentName = (PARSED && PARSED.name) || '';
+  if (naming.mode === 'default') {
+    previewEl.innerHTML = `پیش‌نمایش: نام کانفیگ‌ها تغییر نمی‌کند <b>(${escH(currentName || 'بدون نام')})</b>`;
+    return;
+  }
+  const sampleAddress = (PARSED && PARSED.address) || '1.2.3.4';
+  const sampleName = computeConfigName(naming, 0, sampleAddress, currentName);
+  previewEl.innerHTML = `پیش‌نمایش نام کانفیگ اول: <b>${escH(sampleName)}</b>`;
+
+  // Best-effort: resolve the sample address' country in the background so the
+  // preview updates from the "XX" placeholder to a real code once it arrives.
+  // Doesn't block the UI and never re-fetches an address already in cache.
+  if (naming.mode === 'name_number_address_location' && !countryCache.has(sampleAddress)) {
+    fetchCountryCode(sampleAddress).then(code => {
+      if (code === UNKNOWN_COUNTRY) return; // don't cache failures — let it retry next time
+      countryCache.set(sampleAddress, code);
+      saveCountryCache();
+      const stillActive = document.querySelector('input[name="namingMode"]:checked')?.value === 'name_number_address_location';
+      if (stillActive) updateNamingPreview();
+    });
+  }
+}
+
 // ─── CONFIG MAKER (Tab 1) ─────────────────────────
 function parseConfig() {
   const raw = document.getElementById('configInput').value.trim();
@@ -1507,6 +4511,10 @@ function parseConfig() {
     if (!config) { toast('فرمت ناشناخته — باید vmess:// یا vless:// باشد','err'); return; }
     PARSED = config;
     renderParsed(config);
+    // Prefill the naming field with this config's current name (editable by the user).
+    const nameEl = document.getElementById('namingBaseName');
+    if (nameEl) nameEl.value = config.name || '';
+    updateNamingPreview();
     setStep(2);
     toast('کانفیگ با موفقیت تحلیل شد ✓','ok');
     document.getElementById('parsedCard').scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -1598,7 +4606,7 @@ function buildFields(cfg) {
                {l:'Mode (XHTTP)',v:cfg.mode},{l:'Extra (XHTTP)',v:cfg.extra}];
 }
 
-function generateConfigs() {
+async function generateConfigs() {
   if (!PARSED) { toast('ابتدا یک کانفیگ را تحلیل کنید','err'); return; }
 
   let ips = [];
@@ -1629,7 +4637,32 @@ function generateConfigs() {
     if (ips.length > 5000) { toast(`${ips.length} آی‌پی — فقط ۵۰۰۰ اول استفاده می‌شود`,'wrn'); ips.splice(5000); }
   }
 
-  GENERATED = ips.map((ip, i) => ({ i: i+1, ip, cfg: makeConfig(PARSED, ip) }));
+  const naming = getNamingSettings();
+
+  if (naming.mode === 'name_number_address_location') {
+    const genBtns = [document.getElementById('genRangeBtn'), document.getElementById('genManualBtn')].filter(Boolean);
+    const progEl  = document.getElementById('namingLocationProgress');
+    genBtns.forEach(b => b.disabled = true);
+    if (progEl) { progEl.textContent = '🌍 در حال تشخیص کشور IPها…'; progEl.classList.remove('hidden'); }
+    try {
+      const { total, failed } = await resolveCountriesForIPs(ips, (done, total) => {
+        if (progEl && total) progEl.textContent = `🌍 در حال تشخیص کشور IPها… ${done.toLocaleString('fa-IR')} از ${total.toLocaleString('fa-IR')}`;
+      });
+      if (total > 0 && failed === total) {
+        toast('تشخیص کشور هیچ IP‌ای موفق نبود (اینترنت/فیلترشکن را بررسی کنید) — به‌جای پرچم، XX درج می‌شود', 'wrn');
+      } else if (failed > 0) {
+        toast(`کشور ${failed.toLocaleString('fa-IR')} از ${total.toLocaleString('fa-IR')} آی‌پی جدید تشخیص داده نشد (XX)`, 'wrn');
+      }
+    } finally {
+      genBtns.forEach(b => b.disabled = false);
+      if (progEl) progEl.classList.add('hidden');
+    }
+  }
+
+  GENERATED = ips.map((ip, i) => {
+    const name = computeConfigName(naming, i, ip, PARSED.name);
+    return { i: i+1, ip, name, cfg: makeConfig(PARSED, ip, name) };
+  });
   renderGenerated();
   setStep(3);
   const modeLabel = makerMode === 'range' ? ' (رندوم از رنج‌های انتخابی)' : '';
@@ -1672,16 +4705,20 @@ function autoExportConfigs() {
   toast(`📥 فایل ${ts}.txt ذخیره شد`, 'ok');
 }
 
-function makeVMess(cfg,ip) {
-  const j={...cfg.raw,add:ip};
+// `name` is the remark/ps to embed for this specific IP; falls back to the
+// config's original name when omitted (keeps old call-sites/behavior intact).
+function makeVMess(cfg,ip,name) {
+  const finalName = name===undefined ? cfg.name : name;
+  const j={...cfg.raw,ps:finalName,add:ip};
   return `vmess://${btoa(unescape(encodeURIComponent(JSON.stringify(j))))}`;
 }
-function makeVLess(cfg,ip) {
+function makeVLess(cfg,ip,name) {
   const host=ip.includes(':')?`[${ip}]`:ip;
-  const frag=cfg.name?`#${encodeURIComponent(cfg.name)}`:'';
+  const finalName = name===undefined ? cfg.name : name;
+  const frag=finalName?`#${encodeURIComponent(finalName)}`:'';
   return `vless://${cfg.uuid}@${host}:${cfg.port}?${cfg.rawQS}${frag}`;
 }
-function makeConfig(cfg,ip) { return cfg.proto==='vmess'?makeVMess(cfg,ip):makeVLess(cfg,ip); }
+function makeConfig(cfg,ip,name) { return cfg.proto==='vmess'?makeVMess(cfg,ip,name):makeVLess(cfg,ip,name); }
 
 function renderGenerated() {
   const card=document.getElementById('genCard'),list=document.getElementById('genList');
@@ -1694,15 +4731,116 @@ function renderGenerated() {
     <div class="stat-box"><div class="stat-val">${PARSED.port}</div><div class="stat-lbl">پورت</div></div>
     <div class="stat-box"><div class="stat-val">${netLabel}</div><div class="stat-lbl">نوع شبکه</div></div>
     <div class="stat-box"><div class="stat-val">${tlsVal||'none'}</div><div class="stat-lbl">امنیت</div></div>`;
-  list.innerHTML=GENERATED.map(({i,ip,cfg})=>`
+  list.innerHTML=GENERATED.map(({i,ip,name,cfg},idx)=>{
+    const qrTooBig = cfg.length > QR_MAX_BYTES;
+    const qrIcon  = qrTooBig ? '⚠️' : '🔳';
+    const qrTitle = qrTooBig
+      ? `این کانفیگ ${cfg.length.toLocaleString('fa-IR')} بایت است — بزرگ‌تر از حداکثر ظرفیت QR Code (${QR_MAX_BYTES.toLocaleString('fa-IR')} بایت)`
+      : 'نمایش QR Code';
+    return `
     <div class="gen-item">
       <div class="gen-num">${i}</div>
       <div class="gen-ip">${escH(ip)}</div>
+      <div class="gen-name" title="${escAttr(name||'')}">${escH(name||'')}</div>
       <div class="gen-cfg">${escH(cfg)}</div>
+      <button class="btn btn-ghost btn-sm" onclick="openQrModal(${idx})" title="${escAttr(qrTitle)}">${qrIcon}</button>
       <button class="btn btn-ghost btn-sm" onclick="copyText('${escAttr(cfg)}')" title="کپی">📋</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   card.classList.remove('hidden');
 }
+
+// ─── QR CODE MODAL ─────────────────────────────────
+// Renders a scannable QR code for a single generated config so it can be
+// imported into a V2Ray client by pointing its camera at this screen.
+//
+// 2953 bytes is the absolute maximum any standard QR code can hold (version
+// 40, the largest defined size, at error-correction level 'L', the lowest
+// overhead / highest-capacity level) — a hard limit of the QR spec itself,
+// not something that can be configured around.
+const QR_MAX_BYTES = 2953;
+
+function openQrModal(idx) {
+  const item = GENERATED[idx];
+  if (!item) { toast('کانفیگ یافت نشد', 'err'); return; }
+  const sub = item.name ? `${item.ip} — ${item.name}` : item.ip;
+  renderQrCode(item.cfg, sub, `کانفیگ #${item.i}`);
+}
+
+function renderQrCode(text, sub, numLabel) {
+  const box = document.getElementById('qrCodeBox');
+  box.classList.remove('qr-error');
+  document.getElementById('qrModalLabel').textContent = sub || '';
+  document.getElementById('qrModalNum').textContent = numLabel || '';
+  document.getElementById('qrModalText').textContent = text;
+
+  // Config URIs are always plain ASCII (base64 for vmess, percent-encoded
+  // for vless), so char length == byte length here — cheap & accurate.
+  const byteLen = qrcode.stringToBytes(text).length;
+  if (byteLen > QR_MAX_BYTES) {
+    box.classList.add('qr-error');
+    box.innerHTML = `<div class="qr-error-icon">⚠️</div><div class="qr-error-text">
+      این کانفیگ <b>${byteLen.toLocaleString('fa-IR')} بایت</b> است — بزرگ‌تر از حداکثر ظرفیت یک QR Code استاندارد
+      (<b>${QR_MAX_BYTES.toLocaleString('fa-IR')} بایت</b>).<br>
+      برای QR Code قابل‌اسکن نیست؛ متن کامل را از کادر پایین کپی کنید.</div>`;
+    document.getElementById('qrModal').classList.remove('hidden');
+    return;
+  }
+
+  try {
+    // typeNumber 0 → smallest QR version that fits the data (keeps the grid
+    // as simple as possible so it's easier to scan from a distance).
+    // 'L' → lowest error-correction, i.e. maximum data capacity for that size.
+    const qr = qrcode(0, 'L');
+    qr.addData(text);
+    qr.make();
+    box.innerHTML = qr.createSvgTag({ scalable: true });
+  } catch (e) {
+    box.classList.add('qr-error');
+    box.innerHTML = `<div class="qr-error-icon">⚠️</div><div class="qr-error-text">تولید QR Code ناموفق بود.<br>متن کامل را از کادر پایین کپی کنید.</div>`;
+    toast('تولید QR Code ناموفق بود: ' + e, 'err');
+  }
+  document.getElementById('qrModal').classList.remove('hidden');
+}
+
+function closeQrModal() {
+  document.getElementById('qrModal').classList.add('hidden');
+  if (isQrFullscreen()) exitQrFullscreen();
+}
+
+function isQrFullscreen() {
+  return !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+}
+
+function exitQrFullscreen() {
+  const exit = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+  if (exit) { try { exit.call(document); } catch {} }
+}
+
+function toggleQrFullscreen() {
+  const box = document.getElementById('qrModalBox');
+  if (!isQrFullscreen()) {
+    const req = box.requestFullscreen || box.webkitRequestFullscreen || box.msRequestFullscreen;
+    if (!req) { toast('حالت تمام‌صفحه در این مرورگر پشتیبانی نمی‌شود', 'wrn'); return; }
+    const p = req.call(box);
+    if (p && p.catch) p.catch(() => toast('امکان ورود به حالت تمام‌صفحه نبود', 'err'));
+  } else {
+    exitQrFullscreen();
+  }
+}
+
+function updateQrFullscreenBtn() {
+  const btn = document.getElementById('qrFullscreenBtn');
+  if (!btn) return;
+  btn.textContent = isQrFullscreen() ? '🗗 خروج از تمام‌صفحه' : '⛶ تمام‌صفحه';
+}
+['fullscreenchange','webkitfullscreenchange','msfullscreenchange'].forEach(ev=>document.addEventListener(ev, updateQrFullscreenBtn));
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !document.getElementById('qrModal').classList.contains('hidden')) {
+    closeQrModal();
+  }
+});
 
 function setStep(n) {
   for(let i=1;i<=3;i++){
@@ -1749,8 +4887,10 @@ function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
 function escAttr(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;')}
 
 // ── Init ───────────────────────────────────────────
+syncThemeUI();
 renderCFGroups();
 renderMyLists(); // also calls renderMakerRanges() internally
+updateNamingPreview();
 
 // ─── ADDRESS EXTRACTOR (Tab 3) ────────────────────
 let EXTRACTED_ADDRESSES = [];
@@ -1876,6 +5016,12 @@ function sendAddressesToMaker() {
   setMakerMode('manual');
   document.querySelectorAll('.tab-btn')[0].click();
   toast(`${EXTRACTED_ADDRESSES.length} آدرس به Config Maker ارسال شد ✓`, 'ok');
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./sw.js');
+  });
 }
 
 </script>
