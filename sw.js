@@ -1,4 +1,4 @@
-const CACHE = 'v2ray-config-maker-v3';
+const CACHE = 'v2ray-config-maker-v4';
 const ASSETS = ['./index.html', './manifest.json', './robots.txt'];
 
 self.addEventListener('install', e => {
