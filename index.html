@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+  <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+  <meta http-equiv="X-Robots-Tag" content="noindex, nofollow, noarchive, nosnippet" />
   <meta name="theme-color" content="#030712" />
   <link rel="manifest" href="manifest.json" />
   <title>V2Ray Config Maker</title>
@@ -16,6 +19,11 @@
       } catch (e) {
         document.documentElement.setAttribute('data-theme', 'dark');
       }
+      try {
+        if (sessionStorage.getItem('v2ray_gate_v1') === '1') {
+          document.documentElement.setAttribute('data-unlocked', '1');
+        }
+      } catch (e) {}
     })();
   </script>
   <style>
@@ -471,9 +479,76 @@
     .step-label{font-size:.73rem;color:var(--text2);white-space:nowrap}
     .step-line{width:55px;height:2px;background:rgba(99,102,241,.2);margin-bottom:22px}
     @media(max-width:600px){.steps-bar{display:none}}
+
+    html:not([data-unlocked="1"]) body > :not(#access-gate) { display: none !important; }
+    #access-gate {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg); padding: 24px;
+    }
+    html[data-unlocked="1"] #access-gate { display: none !important; }
+    .gate-card {
+      width: 100%; max-width: 380px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 18px; padding: 28px 24px 22px;
+      box-shadow: 0 16px 40px var(--shadow-color-strong);
+      backdrop-filter: blur(16px); text-align: center;
+    }
+    .gate-card h2 { font-size: 1.15rem; margin-bottom: 8px; }
+    .gate-card p { font-size: .85rem; color: var(--text2); margin-bottom: 18px; }
+    .gate-card input {
+      width: 100%; height: 44px; border-radius: 10px; padding: 0 12px;
+      background: var(--panel-bg-strong); border: 1px solid var(--border);
+      color: var(--text); font-size: 1rem; text-align: center; letter-spacing: .08em;
+    }
+    .gate-card input:focus { outline: none; border-color: var(--border-h); }
+    .gate-card button { width: 100%; margin-top: 12px; }
+    .gate-err { color: var(--rose); font-size: .8rem; min-height: 1.2em; margin-top: 10px; }
   </style>
 </head>
 <body>
+
+<div id="access-gate">
+  <form class="gate-card" onsubmit="return unlockSite(event)">
+    <h2>ورود به Config Maker</h2>
+    <p>این صفحه خصوصی است. برای ادامه رمز را وارد کنید.</p>
+    <input id="gatePass" type="password" autocomplete="current-password" autofocus placeholder="رمز عبور" />
+    <button class="btn btn-indigo" type="submit">ورود</button>
+    <div class="gate-err" id="gateErr"></div>
+  </form>
+</div>
+<script>
+  var GATE_HASH = 'a22aba54b9a655621d96f52ee8c9e040dc3ce4cd1e4c14a15ce990e7fcad3370';
+  function hexSha256(buf) {
+    return Array.from(new Uint8Array(buf)).map(function (b) {
+      return b.toString(16).padStart(2, '0');
+    }).join('');
+  }
+  function unlockSite(ev) {
+    ev.preventDefault();
+    var input = document.getElementById('gatePass');
+    var err = document.getElementById('gateErr');
+    err.textContent = '';
+    var value = (input && input.value) ? input.value : '';
+    if (!window.crypto || !crypto.subtle) {
+      err.textContent = 'مرورگر از ورود امن پشتیبانی نمی‌کند';
+      return false;
+    }
+    crypto.subtle.digest('SHA-256', new TextEncoder().encode(value)).then(function (buf) {
+      if (hexSha256(buf) !== GATE_HASH) {
+        err.textContent = 'رمز نادرست است';
+        input.value = '';
+        input.focus();
+        return;
+      }
+      try { sessionStorage.setItem('v2ray_gate_v1', '1'); } catch (e) {}
+      document.documentElement.setAttribute('data-unlocked', '1');
+    }).catch(function () {
+      err.textContent = 'خطا در بررسی رمز';
+    });
+    return false;
+  }
+</script>
 
 <div class="blobs"><span></span><span></span><span></span></div>
 <div id="toasts"></div>

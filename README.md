@@ -2,8 +2,8 @@
 
 ابزار تک‌صفحه‌ای (Pure HTML/JS) برای ساخت، تست و مدیریت کانفیگ‌های **VMess** و **VLess**.
 
-- **مخزن:** [github.com/alireza-aminzadeh/cconfig-maker](https://github.com/alireza-aminzadeh/cconfig-maker)
-- **نسخه آنلاین:** [alireza-aminzadeh.github.io/cconfig-maker](https://alireza-aminzadeh.github.io/cconfig-maker/)
+- **مخزن:** خصوصی
+- **نسخه آنلاین:** با رمز ورود · `noindex, nofollow`
 
 ## امکانات
 
@@ -60,6 +60,7 @@ https://alireza-aminzadeh.github.io/cconfig-maker/
 ```text
 cconfig-maker/
 ├── index.html          # برنامه (GitHub Pages)
+├── robots.txt          # Disallow همهٔ خزنده‌ها
 ├── manifest.json       # PWA
 ├── sw.js               # Service Worker
 ├── .github/workflows/
@@ -72,6 +73,7 @@ cconfig-maker/
 ## نکات
 
 - تمام داده‌ها در مرورگر (localStorage) ذخیره می‌شوند؛ سرور لازم نیست
+- صفحه با `noindex, nofollow` و `robots.txt` از ایندکس موتورهای جستجو خارج است
 - تست تاخیر از `fetch` با `no-cors` است و فقط دسترسی HTTP را می‌سنجد
 - برای تست واقعی V2Ray/TLS به backend جداگانه نیاز است
 
